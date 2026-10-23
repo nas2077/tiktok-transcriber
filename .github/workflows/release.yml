@@ -5,8 +5,6 @@ name: Release
 on:
   push:
     tags: ['v*']
-    # TEMPORARY: test builds of the packaging branch. Remove before merging.
-    branches: [cross-platform-packages]
   workflow_dispatch:
 permissions:
   contents: read

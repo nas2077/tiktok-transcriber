@@ -25,7 +25,26 @@ GitHub Actions repeats this offline group and audits the pinned Python packages.
 Interactive WebView2 checks passed 77 UI assertions, four models across all 14
 locales and both themes, 144 focus checks, 240 navigation switches, localization,
 anonymous-access controls, motion preferences, and command handling. These
-require an interactive Windows desktop and run locally rather than on CI.
+require an interactive Windows desktop and run locally rather than on CI: on
+GitHub's Windows runner the page never animates, and the same checks fail there
+for the 0.1.0 source too.
+
+## macOS and Linux (0.2.0 packaging)
+
+GitHub Actions runs the offline group on Windows, Ubuntu 24.04 and macOS 15.
+The release workflow builds every package on its own system: Windows x64,
+macOS arm64 and x64, Linux x86_64 (Ubuntu 22.04) and aarch64 (Ubuntu 24.04). It
+starts each built app for 40 seconds with a disposable profile and requires it to
+stay open without a crash log; on Linux it runs under Xvfb. It also checks that
+the bundled Qt, its platform plugins and the media libraries resolve, that PyAV
+reports LGPL-only FFmpeg without x264/x265, and that the Python wheel installs
+and runs `syllark --version`.
+
+Not yet verified on macOS or Linux: real speech recognition and exports in the
+built apps, model downloads, Metal and Vulkan acceleration, CUDA on Linux, the
+Flatpak on a desktop, Wayland sessions, and installation by the terminal scripts
+and package managers on clean machines. The offline check "an eta shows up" is
+timing-sensitive with mocked instant recognition and failed once on macOS CI.
 
 ## Real audio and public network coverage
 
