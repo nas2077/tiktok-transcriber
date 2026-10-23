@@ -44,11 +44,12 @@ case "$kind" in
     appimage)
         # the libraries a desktop already has, then the AppImage itself
         if command -v dnf >/dev/null; then
-            dnf install -y nss alsa-lib mesa-libGL mesa-libEGL libxkbcommon fontconfig dbus-libs libwayland-server
+            dnf install -y nss alsa-lib mesa-libGL mesa-libEGL mesa-libgbm libxkbcommon fontconfig dbus-libs \
+                libwayland-server libstdc++ expat zlib
         else
             apt-get update
             DEBIAN_FRONTEND=noninteractive apt-get install -y libnss3 libasound2 libgl1 libegl1 \
-                libxkbcommon0 libfontconfig1 libdbus-1-3 libwayland-server0
+                libxkbcommon0 libfontconfig1 libdbus-1-3 libwayland-server0 libgbm1 libexpat1
         fi
         image=$(ls "$packages"/*.AppImage)
         chmod +x "$image"

@@ -84,6 +84,19 @@ a = Analysis(
 )
 pyz = PYZ(a.pure)
 
+# Linux: the C++ runtime and the libraries Mesa's graphics drivers are built
+# against come from the system, never from the build machine. The bundle
+# folder is searched first for every library loaded into the app, the
+# system's OpenGL driver included: Ubuntu 22.04's libstdc++ is too old for
+# the LLVM inside Mesa 25, the driver failed to load and Qt aborted with
+# "Could not initialize GLX" on every newer distribution. Every supported
+# system has these, at least as new as the build machine's.
+if LINUX:
+    SYSTEM_ONLY = re.compile(r"lib(stdc\+\+|gcc_s|gbm|expat|z)\.so(\.\d+)*")
+    a.binaries = [b for b in a.binaries
+                  if not (SYSTEM_ONLY.fullmatch(os.path.basename(b[0]))
+                          and b[1].startswith(("/lib/", "/lib64/", "/usr/lib/", "/usr/lib64/")))]
+
 icon = (os.path.join(SRC, "icon.ico") if WINDOWS
         else os.path.join(SRC, "icon.png") if MAC else None)
 exe = EXE(
