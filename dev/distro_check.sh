@@ -7,7 +7,9 @@
 # .github/workflows/distro-check.yml). It installs the package with the
 # system's own package manager, adds what any desktop already has (an X11
 # screen and Mesa's OpenGL drivers), then requires the app to print its
-# version and to stay open for 40 seconds without a crash log.
+# version and to stay open for 40 seconds without a crash log. When the
+# default start fails, it also tries Qt's EGL integration on X11 and reports
+# that result, so a GLX-only failure can be told apart from a broken package.
 set -u
 kind=$1
 # absolute: apt reads "pkg/x.deb" as a package name to download
@@ -17,12 +19,12 @@ desktop_basics() {
     # an X server for the window and Mesa's OpenGL drivers, as any desktop has;
     # one package at a time, so a name one release lacks does not stop the rest
     if command -v apt-get >/dev/null; then
-        for p in xvfb libgl1-mesa-dri; do DEBIAN_FRONTEND=noninteractive apt-get install -y "$p"; done
+        for p in xvfb libgl1-mesa-dri libegl-mesa0; do DEBIAN_FRONTEND=noninteractive apt-get install -y "$p"; done
     elif command -v dnf >/dev/null; then
-        for p in xorg-x11-server-Xvfb mesa-dri-drivers; do dnf install -y "$p"; done
+        for p in xorg-x11-server-Xvfb mesa-dri-drivers mesa-libEGL; do dnf install -y "$p"; done
         command -v Xvfb >/dev/null || { dnf install -y epel-release && dnf install -y xorg-x11-server-Xvfb; }
     elif command -v zypper >/dev/null; then
-        for p in xorg-x11-server-Xvfb Mesa-dri; do zypper --non-interactive install "$p"; done
+        for p in xorg-x11-server-Xvfb Mesa-dri Mesa-libEGL1; do zypper --non-interactive install "$p"; done
     elif command -v pacman >/dev/null; then
         for p in xorg-server-xvfb mesa; do pacman -S --noconfirm "$p"; done
     fi
@@ -57,22 +59,42 @@ set +e
 desktop_basics
 
 tiktok-transcriber --version || { echo "the installed app does not start"; exit 1; }
+crash="$HOME/.local/share/tiktok-transcriber/crash.log"
+
+# start the window for 40 seconds with extra environment ("$@"); the result is
+# 0 when it was still open at the end (timeout's 124) and left no crash log
+start_window() {
+    rm -f "$crash"
+    env "$@" timeout 40 tiktok-transcriber
+    code=$?
+    if [ -f "$crash" ]; then cat "$crash"; return 1; fi
+    [ "$code" = 124 ] || { echo "TikTok Transcriber exited early with code $code"; return 1; }
+}
+
 if command -v Xvfb >/dev/null; then
     # 24-bit color like a real monitor: xvfb-run's default 8-bit screen has no
     # OpenGL configuration, and Qt stops on that
     Xvfb :99 -screen 0 1280x1024x24 -nolisten tcp &
     server=$!
     sleep 3
-    DISPLAY=:99 timeout 40 tiktok-transcriber
-    code=$?
+    if start_window DISPLAY=:99; then
+        result=0
+    else
+        result=1
+        echo "::group::retry with QT_XCB_GL_INTEGRATION=xcb_egl"
+        if start_window DISPLAY=:99 QT_XCB_GL_INTEGRATION=xcb_egl; then
+            egl=passed
+        else
+            egl=failed
+        fi
+        echo "::endgroup::"
+        echo "Default start failed; with QT_XCB_GL_INTEGRATION=xcb_egl it $egl."
+    fi
     kill "$server" 2>/dev/null
 else
     echo "no Xvfb on this system: using Qt's offscreen platform"
-    QT_QPA_PLATFORM=offscreen timeout 40 tiktok-transcriber
-    code=$?
+    start_window QT_QPA_PLATFORM=offscreen
+    result=$?
 fi
-crash="$HOME/.local/share/tiktok-transcriber/crash.log"
-if [ -f "$crash" ]; then cat "$crash"; exit 1; fi
-# timeout's 124 means it was still running when the 40 seconds were up
-[ "$code" = 124 ] || { echo "TikTok Transcriber exited early with code $code"; exit 1; }
+[ "$result" = 0 ] || exit 1
 echo "Installed ($kind) and stayed open for 40 seconds."
