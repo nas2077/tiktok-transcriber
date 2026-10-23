@@ -1,4 +1,4 @@
-"""Syllark desktop window, settings, and a batched Python/WebView2 bridge."""
+"""TikTok Transcriber desktop window, settings, and a batched Python/WebView2 bridge."""
 
 import gc
 import json
@@ -16,7 +16,7 @@ HERE = getattr(sys, "_MEIPASS", None) or os.path.dirname(os.path.abspath(__file_
 # installed with pip, the modules sit in a package folder of their own
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
-TITLE = "Syllark"
+TITLE = "TikTok Transcriber"
 
 import desktop  # noqa: E402  (only the standard library: safe before the crash handler)
 
@@ -1221,7 +1221,7 @@ def window_engine():
 
 
 def run():
-    """the `syllark` command and the built program both start here"""
+    """the `tiktok-transcriber` command and the built program both start here"""
     try:
         if len(sys.argv) in (4, 6) and sys.argv[1] == "--verify-runtime":
             from runtime_check import run as verify

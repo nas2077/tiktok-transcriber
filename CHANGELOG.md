@@ -2,8 +2,10 @@
 
 ## 0.2.0 — unreleased
 
-Syllark on macOS and Linux, and more ways to install it.
+Syllark is now **TikTok Transcriber**, on macOS and Linux too, with more ways to
+install it. The repository moved to `nas2077/tiktok-transcriber`; old links redirect.
 
+- A new icon from the Nas periodic table of projects: element 01, `Tt`, an app.
 - macOS 11+ on Apple silicon and Intel: disk images and a Homebrew cask. Natural
   can use Metal on Apple silicon.
 - Linux x86_64 and aarch64: AppImage, `.deb`, `.rpm`, Arch package, `.tar.gz`, and
@@ -12,8 +14,8 @@ Syllark on macOS and Linux, and more ways to install it.
 - Windows: a per-user installer with Start menu entry and uninstaller, next to the
   portable ZIP; Scoop and winget manifests.
 - One-line terminal installs (`install.sh`, `install.ps1`) that verify SHA-256
-  before installing, and a Python package (`pipx install syllark`).
-- macOS and Linux keep the system title bar; Windows keeps Syllark's own.
+  before installing, and a Python package (`pipx install tiktok-transcriber`).
+- macOS and Linux keep the system title bar; Windows keeps the app's own.
 - All packages keep LGPL-only FFmpeg libraries without x264/x265. The Linux window
   uses the LGPL PySide6.
 - Release workflow: every package is built on its own system and started as a

@@ -12,11 +12,11 @@ if (-not (Test-Path -LiteralPath $EnvironmentPython)) { throw 'Run dev\setup.ps1
 if ($LASTEXITCODE -ne 0) { throw 'License collection failed.' }
 & $EnvironmentPython -m PyInstaller --noconfirm --clean --log-level WARN --distpath (Join-Path $DevelopmentRoot 'build\dist') --workpath (Join-Path $DevelopmentRoot 'build\work') (Join-Path $DevelopmentRoot 'build.spec')
 if ($LASTEXITCODE -ne 0) { throw 'Build failed.' }
-$Distribution = Join-Path $DevelopmentRoot 'build\dist\Syllark'
-if (-not (Test-Path -LiteralPath (Join-Path $Distribution 'Syllark.exe'))) { throw 'Executable is missing.' }
+$Distribution = Join-Path $DevelopmentRoot 'build\dist\TikTok Transcriber'
+if (-not (Test-Path -LiteralPath (Join-Path $Distribution 'TikTok Transcriber.exe'))) { throw 'Executable is missing.' }
 $Version = (Select-String -Path (Join-Path $ProjectRoot 'src\tiktok_core.py') -Pattern '^APP_VERSION = "([^"]+)"').Matches[0].Groups[1].Value
 if (-not $NoZip) {
-    $ReleaseZip = Join-Path $DevelopmentRoot "dist\Syllark-$Version-windows-x64.zip"
+    $ReleaseZip = Join-Path $DevelopmentRoot "dist\TikTok-Transcriber-$Version-windows-x64.zip"
     New-Item -ItemType Directory -Force -Path (Split-Path $ReleaseZip) | Out-Null
     & $EnvironmentPython (Join-Path $DevelopmentRoot 'package_release.py') $Distribution $ReleaseZip
     if ($LASTEXITCODE -ne 0) { throw 'Release ZIP verification failed.' }
@@ -26,7 +26,7 @@ if ($Installer) {
     $Compiler = @("${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe", "$env:ProgramFiles\Inno Setup 6\ISCC.exe") |
         Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
     if (-not $Compiler) { throw 'Inno Setup 6 is required for -Installer.' }
-    & $Compiler /Qp "/DAppVersion=$Version" "/DSourceDir=$Distribution" "/DOutputDir=$(Join-Path $DevelopmentRoot 'dist')" (Join-Path $ProjectRoot 'packaging\windows\syllark.iss')
+    & $Compiler /Qp "/DAppVersion=$Version" "/DSourceDir=$Distribution" "/DOutputDir=$(Join-Path $DevelopmentRoot 'dist')" (Join-Path $ProjectRoot 'packaging\windows\tiktok-transcriber.iss')
     if ($LASTEXITCODE -ne 0) { throw 'Installer build failed.' }
 }
-Write-Host "Built Syllark in $Distribution"
+Write-Host "Built TikTok Transcriber in $Distribution"

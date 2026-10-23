@@ -1,6 +1,6 @@
 # Contributing
 
-Syllark is a Windows desktop application. Development uses Python 3.12,
+TikTok Transcriber is a Windows desktop application. Development uses Python 3.12,
 pywebview/WebView2, and plain HTML, CSS, and JavaScript.
 
 ## Setup
@@ -47,7 +47,7 @@ regressions. See [validation](docs/VALIDATION.md).
 
 ## Public access
 
-Syllark works with public content. Do not add account login, imported cookies,
+TikTok Transcriber works with public content. Do not add account login, imported cookies,
 browser-session reads, or authentication setup controls. Profile embeds are
 discovery inputs, not complete account feeds. Preserve pagination, photo-post
 audio, canonical links, and clear errors for unavailable content.

@@ -2,16 +2,16 @@
 
 The source repository contains no executable, virtual environment, model weights,
 downloaded user media, or build cache. Download runnable packages from
-[GitHub Releases](https://github.com/nas2077/syllark/releases).
+[GitHub Releases](https://github.com/nas2077/tiktok-transcriber/releases).
 
 ## Packages
 
 | System | Files |
 |---|---|
-| Windows 10/11 x64 | `Syllark-<version>-windows-x64-setup.exe` (per-user installer), `Syllark-<version>-windows-x64.zip` (portable) |
-| macOS 11+ | `Syllark-<version>-macos-arm64.dmg` (Apple silicon), `Syllark-<version>-macos-x64.dmg` (Intel) |
+| Windows 10/11 x64 | `TikTok-Transcriber-<version>-windows-x64-setup.exe` (per-user installer), `TikTok-Transcriber-<version>-windows-x64.zip` (portable) |
+| macOS 11+ | `TikTok-Transcriber-<version>-macos-arm64.dmg` (Apple silicon), `TikTok-Transcriber-<version>-macos-x64.dmg` (Intel) |
 | Linux x86_64 / aarch64 | `.AppImage`, `.tar.gz`, `.deb`, `.rpm`, Arch `.pkg.tar.zst`; Flatpak bundle for x86_64 |
-| Any system with Python 3.11+ | `syllark-<version>-py3-none-any.whl` and the source archive |
+| Any system with Python 3.11+ | `tiktok_transcriber-<version>-py3-none-any.whl` and the source archive |
 
 Linux x86_64 packages are built on Ubuntu 22.04 and need glibc 2.35 or newer
 (Ubuntu 22.04, Debian 12, Fedora 36, RHEL/Rocky/Alma 9 or newer). Linux aarch64
@@ -30,7 +30,7 @@ macOS asks the first time: open System Settings > Privacy & Security and choose
 Download the package and `SHA256SUMS.txt` from the same release, then compare:
 
 ```powershell
-Get-FileHash .\Syllark-0.2.0-windows-x64-setup.exe -Algorithm SHA256
+Get-FileHash .\TikTok-Transcriber-0.2.0-windows-x64-setup.exe -Algorithm SHA256
 ```
 
 ```bash
@@ -50,7 +50,7 @@ powershell -ExecutionPolicy Bypass -File dev\build.ps1 -Quiet -Installer
 
 The script creates/uses `dev/.venv`, installs constrained dependencies, verifies
 the media inputs, installs the LGPL PyAV variant, collects license texts, and
-builds with PyInstaller. Output goes to `dev/build/dist/Syllark`; the verified
+builds with PyInstaller. Output goes to `dev/build/dist/TikTok Transcriber`; the verified
 ZIP and installer go to `dev/dist`. It does not overwrite an installed copy.
 
 macOS and Linux:
@@ -77,10 +77,10 @@ release workflow runs it and attaches the result as `package-manifests.zip`.
 
 | Channel | File | After publishing |
 |---|---|---|
-| Homebrew | `Casks/syllark.rb` | Commit it: this repository is its own tap. |
-| Scoop | `bucket/syllark.json` | Commit it: this repository is its own bucket. |
+| Homebrew | `Casks/tiktok-transcriber.rb` | Commit it: this repository is its own tap. |
+| Scoop | `bucket/tiktok-transcriber.json` | Commit it: this repository is its own bucket. |
 | winget | `packaging/winget/<version>/` | Submit to microsoft/winget-pkgs (`wingetcreate submit`). |
-| AUR | `packaging/aur/PKGBUILD`, `.SRCINFO` | Push to the `syllark-bin` AUR repository. |
+| AUR | `packaging/aur/PKGBUILD`, `.SRCINFO` | Push to the `tiktok-transcriber-bin` AUR repository. |
 | PyPI | wheel and source archive | `twine upload` or trusted publishing from the PyPI project. |
 | Flathub | `packaging/linux/flatpak/` | Optional: a Flathub submission must build from sources. |
 

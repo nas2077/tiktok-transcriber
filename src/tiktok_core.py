@@ -29,7 +29,7 @@ os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
 #    show how far along it is, and a cut download picks up where it stopped
 os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
 
-APP_NAME = "Syllark"
+APP_NAME = "TikTok Transcriber"
 APP_VERSION = "0.2.0"
 STORAGE_NAME = "TikTok Transcriber"
 FROZEN = bool(getattr(sys, "frozen", False))
@@ -43,7 +43,7 @@ def data_dir():
     """
     where the settings, the window cache and the graphics card libraries live:
     %LOCALAPPDATA%/TikTok Transcriber, like any other windows program
-    (~/Library/Application Support/Syllark on macos, ~/.local/share/syllark
+    (~/Library/Application Support/TikTok Transcriber on macos, ~/.local/share/tiktok-transcriber
     on linux). the folder with the program stays as it was unpacked.
 
     older windows versions kept them in a "data" folder next to the program

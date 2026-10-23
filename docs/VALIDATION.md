@@ -38,7 +38,7 @@ starts each built app for 40 seconds with a disposable profile and requires it t
 stay open without a crash log; on Linux it runs under Xvfb. It also checks that
 the bundled Qt, its platform plugins and the media libraries resolve, that PyAV
 reports LGPL-only FFmpeg without x264/x265, and that the Python wheel installs
-and runs `syllark --version`.
+and runs `tiktok-transcriber --version`.
 
 Not yet verified on macOS or Linux: real speech recognition and exports in the
 built apps, model downloads, Metal and Vulkan acceleration, CUDA on Linux, the
@@ -60,7 +60,7 @@ then all 56 skipped on resume without duplicates. Five unavailable discovery
 attempts were recorded separately. A feed can change; these are observations
 from the test date, not permanent account totals.
 
-These broader integration runs preceded the Syllark identity and media-packaging
+These broader integration runs preceded the TikTok Transcriber identity and media-packaging
 changes. The recognition logic was retained. Release preparation repeated the
 interactive regressions and tested the new executable with real offline CPU and
 Vulkan inference on two speech recordings and a no-speech ASMR recording, with

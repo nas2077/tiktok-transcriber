@@ -1,4 +1,4 @@
-"""`python -m syllark` from an installed package."""
+"""`python -m tiktok_transcriber` from an installed package."""
 import os
 import sys
 

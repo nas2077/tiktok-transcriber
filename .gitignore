@@ -28,6 +28,7 @@ __pycache__/
 !/dev/controls_check.py
 !/dev/core_check.py
 !/dev/design_check.py
+!/dev/element.py
 !/dev/localization_check.py
 !/dev/make_packages.py
 !/dev/model_benchmark.py
@@ -45,6 +46,7 @@ __pycache__/
 !/dev/requirements.txt
 !/dev/run.bat
 !/dev/screenshots.py
+!/dev/speech_smoke.py
 !/dev/setup.ps1
 !/dev/ui_check.py
 !/dev/update_manifests.py
@@ -55,7 +57,7 @@ __pycache__/
 /dist/
 *.egg-info/
 /.flatpak-builder/
-/packaging/linux/flatpak/syllark-bundle.tar.gz
+/packaging/linux/flatpak/tiktok-transcriber-bundle.tar.gz
 
 # Historical local reports and translated README drafts
 /docs/*.it.md

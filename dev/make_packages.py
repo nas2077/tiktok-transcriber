@@ -1,7 +1,7 @@
 """Turn the PyInstaller build into the macOS and Linux release packages.
 
-macOS: Syllark-<version>-macos-<arm64|x64>.dmg
-Linux: Syllark-<version>-linux-<arch>.tar.gz and .AppImage, plus .deb, .rpm and
+macOS: TikTok-Transcriber-<version>-macos-<arm64|x64>.dmg
+Linux: TikTok-Transcriber-<version>-linux-<arch>.tar.gz and .AppImage, plus .deb, .rpm and
        an Arch package through nfpm.
 
 Run by dev/build.sh after PyInstaller. `appimagetool` and `nfpm` must be on
@@ -24,7 +24,7 @@ DEV = ROOT / "dev"
 BUILD = DEV / "build" / "dist"
 DIST = DEV / "dist"
 LINUX_FILES = ROOT / "packaging" / "linux"
-APP_ID = "io.github.nas2077.Syllark"
+APP_ID = "io.github.nas2077.TikTokTranscriber"
 
 
 def version():
@@ -55,20 +55,20 @@ def missing(tool, strict):
 
 
 def mac(ver):
-    app = BUILD / "Syllark.app"
-    if not (app / "Contents" / "MacOS" / "Syllark").is_file():
-        raise SystemExit("Expected dev/build/dist/Syllark.app")
+    app = BUILD / "TikTok Transcriber.app"
+    if not (app / "Contents" / "MacOS" / "TikTok Transcriber").is_file():
+        raise SystemExit("Expected dev/build/dist/TikTok Transcriber.app")
     arch = "arm64" if machine() == "aarch64" else "x64"
-    target = DIST / f"Syllark-{ver}-macos-{arch}.dmg"
+    target = DIST / f"TikTok-Transcriber-{ver}-macos-{arch}.dmg"
     with tempfile.TemporaryDirectory() as folder:
-        stage = Path(folder) / "Syllark"
+        stage = Path(folder) / "TikTok Transcriber"
         stage.mkdir()
         # symlinks=True keeps the frameworks' internal links, which the
         # signature of the bundle depends on
-        shutil.copytree(app, stage / "Syllark.app", symlinks=True)
+        shutil.copytree(app, stage / "TikTok Transcriber.app", symlinks=True)
         (stage / "Applications").symlink_to("/Applications")
         target.unlink(missing_ok=True)
-        run("hdiutil", "create", "-volname", "Syllark", "-srcfolder", stage,
+        run("hdiutil", "create", "-volname", "TikTok Transcriber", "-srcfolder", stage,
             "-fs", "HFS+", "-format", "UDZO", "-imagekey", "zlib-level=9", "-ov", target)
     run("hdiutil", "verify", target)
     return [target]
@@ -78,9 +78,9 @@ def mac(ver):
 
 
 def linux(ver, strict):
-    bundle = BUILD / "Syllark"
-    if not (bundle / "Syllark").is_file():
-        raise SystemExit("Expected dev/build/dist/Syllark/Syllark")
+    bundle = BUILD / "tiktok-transcriber"
+    if not (bundle / "tiktok-transcriber").is_file():
+        raise SystemExit("Expected dev/build/dist/tiktok-transcriber/tiktok-transcriber")
     arch = machine()
     made = [tarball(bundle, ver, arch)]
     if not missing("appimagetool", strict):
@@ -92,24 +92,24 @@ def linux(ver, strict):
 
 def tarball(bundle, ver, arch):
     """the bundle plus its desktop entry, for anyone who installs by hand"""
-    target = DIST / f"Syllark-{ver}-linux-{arch}.tar.gz"
+    target = DIST / f"TikTok-Transcriber-{ver}-linux-{arch}.tar.gz"
     with tarfile.open(target, "w:gz", compresslevel=9) as archive:
-        archive.add(bundle, "Syllark")
-        archive.add(LINUX_FILES / f"{APP_ID}.desktop", f"Syllark/{APP_ID}.desktop")
-        archive.add(LINUX_FILES / f"{APP_ID}.metainfo.xml", f"Syllark/{APP_ID}.metainfo.xml")
-        archive.add(ROOT / "src" / "icon.png", f"Syllark/{APP_ID}.png")
+        archive.add(bundle, "tiktok-transcriber")
+        archive.add(LINUX_FILES / f"{APP_ID}.desktop", f"tiktok-transcriber/{APP_ID}.desktop")
+        archive.add(LINUX_FILES / f"{APP_ID}.metainfo.xml", f"tiktok-transcriber/{APP_ID}.metainfo.xml")
+        archive.add(ROOT / "src" / "icon.png", f"tiktok-transcriber/{APP_ID}.png")
     with tarfile.open(target) as archive:
         names = archive.getnames()
-        assert "Syllark/Syllark" in names and f"Syllark/{APP_ID}.desktop" in names
+        assert "tiktok-transcriber/tiktok-transcriber" in names and f"tiktok-transcriber/{APP_ID}.desktop" in names
     return target
 
 
 def appimage(bundle, ver, arch):
     """one file that runs on any recent distribution"""
-    target = DIST / f"Syllark-{ver}-linux-{arch}.AppImage"
+    target = DIST / f"TikTok-Transcriber-{ver}-linux-{arch}.AppImage"
     with tempfile.TemporaryDirectory() as folder:
-        appdir = Path(folder) / "Syllark.AppDir"
-        shutil.copytree(bundle, appdir / "usr" / "lib" / "syllark", symlinks=True)
+        appdir = Path(folder) / "TikTok-Transcriber.AppDir"
+        shutil.copytree(bundle, appdir / "usr" / "lib" / "tiktok-transcriber", symlinks=True)
         shutil.copy2(LINUX_FILES / f"{APP_ID}.desktop", appdir / f"{APP_ID}.desktop")
         shutil.copy2(ROOT / "src" / "icon.png", appdir / f"{APP_ID}.png")
         icons = appdir / "usr" / "share" / "icons" / "hicolor" / "512x512" / "apps"
@@ -120,7 +120,7 @@ def appimage(bundle, ver, arch):
         shutil.copy2(LINUX_FILES / f"{APP_ID}.metainfo.xml", metainfo / f"{APP_ID}.appdata.xml")
         apprun = appdir / "AppRun"
         apprun.write_text('#!/bin/sh\nHERE="$(dirname "$(readlink -f "$0")")"\n'
-                          'exec "$HERE/usr/lib/syllark/Syllark" "$@"\n', encoding="utf-8")
+                          'exec "$HERE/usr/lib/tiktok-transcriber/tiktok-transcriber" "$@"\n', encoding="utf-8")
         apprun.chmod(0o755)
         target.unlink(missing_ok=True)
         env = dict(os.environ, ARCH=arch, APPIMAGE_EXTRACT_AND_RUN="1")
@@ -132,7 +132,7 @@ def appimage(bundle, ver, arch):
 def native_packages(ver, arch):
     """.deb, .rpm and the Arch package, all from packaging/linux/nfpm.yaml"""
     goarch = {"x86_64": "amd64", "aarch64": "arm64"}.get(arch, arch)
-    env = dict(os.environ, SYLLARK_VERSION=ver, SYLLARK_ARCH=goarch)
+    env = dict(os.environ, TIKTOK_TRANSCRIBER_VERSION=ver, TIKTOK_TRANSCRIBER_ARCH=goarch)
     made = []
     for packager in ("deb", "rpm", "archlinux"):
         before = set(DIST.iterdir())

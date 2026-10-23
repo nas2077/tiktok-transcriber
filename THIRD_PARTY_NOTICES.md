@@ -1,6 +1,6 @@
 # Third-party notices
 
-The MIT license in `LICENSE` covers original Syllark code and Nas artwork.
+The MIT license in `LICENSE` covers original TikTok Transcriber code and Nas artwork.
 It does not replace the licenses of dependencies, model weights, or system
 components. Supplied license texts are retained under `src/licenses` and
 included in Windows packages.
@@ -22,7 +22,7 @@ and [model documentation](docs/MODELS.md).
 
 ## PyAV and FFmpeg
 
-PyAV source is BSD-3-Clause. Syllark repacks its pinned Windows wheel as
+PyAV source is BSD-3-Clause. TikTok Transcriber repacks its pinned Windows wheel as
 `18.1.0+lgpl.1`, changing extension DLL import names to use a separately supplied
 LGPL-only shared FFmpeg build. The original x264/x265 libraries are not included.
 No PyAV recognition or decoding code is rewritten.
@@ -34,7 +34,7 @@ the package. Additional incorporated components retain their upstream notices.
 The FFmpeg DLLs are separate replaceable files under the application runtime.
 You may replace or relink the LGPL libraries and reverse engineer the combined
 work as needed to debug your modifications under the applicable license terms.
-Syllark's MIT terms do not restrict those rights.
+TikTok Transcriber's MIT terms do not restrict those rights.
 
 Build input checksums, upstream source revisions, the packaging modification,
 and reproducible steps are in `dev/media.lock.json`, `dev/prepare_media.py`, and
@@ -43,7 +43,7 @@ retained with the release rather than in the Git source tree.
 
 ## Interface and runtime
 
-The Nas design system, Orbi, and Syllark mark are by Nas. Inter is licensed
+The Nas design system, Orbi, and TikTok Transcriber mark are by Nas. Inter is licensed
 under SIL Open Font License 1.1 and requested from Google Fonts. pywebview uses
 BSD-3-Clause; pythonnet uses MIT. Python uses the PSF license. WebView2 and Windows
 runtime components retain Microsoft's terms. Optional NVIDIA CUDA libraries are

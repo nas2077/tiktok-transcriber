@@ -13,6 +13,8 @@ WINDOWS = sys.platform == "win32"
 MAC = sys.platform == "darwin"
 LINUX = not WINDOWS and not MAC
 # read, not imported: importing tiktok_core would set up the whole engine
+# what people see on Windows and macOS; Linux commands and folders have no spaces
+NAME = "tiktok-transcriber" if LINUX else "TikTok Transcriber"
 with open(os.path.join(SRC, "tiktok_core.py"), encoding="utf-8") as f:
     APP_VERSION = re.search(r'^APP_VERSION = "([^"]+)"', f.read(), re.M)[1]
 
@@ -89,7 +91,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="Syllark",
+    name=NAME,
     icon=icon,
     console=False,              # a window, no black console behind it
     contents_directory="runtime" if WINDOWS else "_internal",
@@ -97,18 +99,18 @@ exe = EXE(
     upx=False,                  # compressed dlls trip antiviruses and start slower
 )
 
-coll = COLLECT(exe, a.binaries, a.datas, name="Syllark", upx=False)
+coll = COLLECT(exe, a.binaries, a.datas, name=NAME, upx=False)
 
 if MAC:
     app = BUNDLE(
         coll,
-        name="Syllark.app",
+        name="TikTok Transcriber.app",
         icon=icon,
-        bundle_identifier="io.github.nas2077.syllark",
+        bundle_identifier="io.github.nas2077.tiktok-transcriber",
         version=APP_VERSION,
         info_plist={
-            "CFBundleName": "Syllark",
-            "CFBundleDisplayName": "Syllark",
+            "CFBundleName": "TikTok Transcriber",
+            "CFBundleDisplayName": "TikTok Transcriber",
             "CFBundleShortVersionString": APP_VERSION,
             "CFBundleVersion": APP_VERSION,
             "LSMinimumSystemVersion": "11.0",

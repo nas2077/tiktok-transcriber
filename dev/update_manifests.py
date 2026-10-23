@@ -2,12 +2,12 @@
 
     python dev/update_manifests.py 0.2.0 SHA256SUMS.txt
 
-Writes, all pointing at https://github.com/nas2077/syllark/releases/tag/v<version>:
+Writes, all pointing at https://github.com/nas2077/tiktok-transcriber/releases/tag/v<version>:
 
-- Casks/syllark.rb              Homebrew cask (this repository is its own tap)
-- bucket/syllark.json           Scoop manifest (this repository is its own bucket)
+- Casks/tiktok-transcriber.rb              Homebrew cask (this repository is its own tap)
+- bucket/tiktok-transcriber.json           Scoop manifest (this repository is its own bucket)
 - packaging/winget/<version>/   winget manifests, to submit to microsoft/winget-pkgs
-- packaging/aur/PKGBUILD and .SRCINFO, to push to the AUR as syllark-bin
+- packaging/aur/PKGBUILD and .SRCINFO, to push to the AUR as tiktok-transcriber-bin
 
 The release workflow runs it after building; commit the result together with
 the release (docs/RELEASING.md).
@@ -18,9 +18,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-REPO = "https://github.com/nas2077/syllark"
+REPO = "https://github.com/nas2077/tiktok-transcriber"
 SUMMARY = "Readable transcripts from public TikTok clips and profiles, recognized locally"
-DESCRIPTION = ("Syllark turns public TikTok videos and profiles into readable transcripts. "
+DESCRIPTION = ("TikTok Transcriber turns public TikTok videos and profiles into readable transcripts. "
                "Recognition runs locally with integrated Qwen and Whisper models.")
 
 
@@ -47,19 +47,19 @@ def write(path, text):
 
 
 def homebrew(ver, sums):
-    arm = need(sums, f"Syllark-{ver}-macos-arm64.dmg")
-    intel = need(sums, f"Syllark-{ver}-macos-x64.dmg")
-    write("Casks/syllark.rb", f'''# brew tap nas2077/syllark {REPO}
-# brew install --cask syllark
-cask "syllark" do
+    arm = need(sums, f"TikTok-Transcriber-{ver}-macos-arm64.dmg")
+    intel = need(sums, f"TikTok-Transcriber-{ver}-macos-x64.dmg")
+    write("Casks/tiktok-transcriber.rb", f'''# brew tap nas2077/tiktok-transcriber {REPO}
+# brew install --cask tiktok-transcriber
+cask "tiktok-transcriber" do
   arch arm: "arm64", intel: "x64"
 
   version "{ver}"
   sha256 arm:   "{arm}",
          intel: "{intel}"
 
-  url "{REPO}/releases/download/v#{{version}}/Syllark-#{{version}}-macos-#{{arch}}.dmg"
-  name "Syllark"
+  url "{REPO}/releases/download/v#{{version}}/TikTok-Transcriber-#{{version}}-macos-#{{arch}}.dmg"
+  name "TikTok Transcriber"
   desc "{SUMMARY}"
   homepage "{REPO}"
 
@@ -70,21 +70,21 @@ cask "syllark" do
 
   depends_on macos: ">= :big_sur"
 
-  app "Syllark.app"
+  app "TikTok Transcriber.app"
 
-  zap trash: "~/Library/Application Support/Syllark"
+  zap trash: "~/Library/Application Support/TikTok Transcriber"
 
   caveats <<~EOS
-    Syllark is not signed with an Apple Developer ID. If macOS refuses to open
+    TikTok Transcriber is not signed with an Apple Developer ID. If macOS refuses to open
     it the first time, open System Settings > Privacy & Security and choose
-    "Open Anyway" for Syllark.
+    "Open Anyway" for TikTok Transcriber.
   EOS
 end
 ''')
 
 
 def scoop(ver, sums):
-    zip_hash = need(sums, f"Syllark-{ver}-windows-x64.zip")
+    zip_hash = need(sums, f"TikTok-Transcriber-{ver}-windows-x64.zip")
     manifest = {
         "version": ver,
         "description": SUMMARY,
@@ -92,34 +92,34 @@ def scoop(ver, sums):
         "license": "MIT",
         "notes": "Models download on first use into %LOCALAPPDATA%\\TikTok Transcriber.",
         "architecture": {"64bit": {
-            "url": f"{REPO}/releases/download/v{ver}/Syllark-{ver}-windows-x64.zip",
+            "url": f"{REPO}/releases/download/v{ver}/TikTok-Transcriber-{ver}-windows-x64.zip",
             "hash": zip_hash,
         }},
-        "extract_dir": "Syllark",
-        "shortcuts": [["Syllark.exe", "Syllark"]],
+        "extract_dir": "TikTok Transcriber",
+        "shortcuts": [["TikTok Transcriber.exe", "TikTok Transcriber"]],
         "checkver": {"github": REPO},
         "autoupdate": {
             "architecture": {"64bit": {
-                "url": f"{REPO}/releases/download/v$version/Syllark-$version-windows-x64.zip",
+                "url": f"{REPO}/releases/download/v$version/TikTok-Transcriber-$version-windows-x64.zip",
             }},
             "hash": {"url": "$baseurl/SHA256SUMS.txt"},
         },
     }
-    write("bucket/syllark.json", json.dumps(manifest, indent=4) + "\n")
+    write("bucket/tiktok-transcriber.json", json.dumps(manifest, indent=4) + "\n")
 
 
 def winget(ver, sums):
-    setup = f"Syllark-{ver}-windows-x64-setup.exe"
+    setup = f"TikTok-Transcriber-{ver}-windows-x64-setup.exe"
     digest = need(sums, setup).upper()
-    base = f"packaging/winget/{ver}/nas2077.Syllark"
+    base = f"packaging/winget/{ver}/nas2077.TikTokTranscriber"
     header = "# Created with dev/update_manifests.py\n"
-    write(f"{base}.yaml", header + f"""PackageIdentifier: nas2077.Syllark
+    write(f"{base}.yaml", header + f"""PackageIdentifier: nas2077.TikTokTranscriber
 PackageVersion: {ver}
 DefaultLocale: en-US
 ManifestType: version
 ManifestVersion: 1.6.0
 """)
-    write(f"{base}.installer.yaml", header + f"""PackageIdentifier: nas2077.Syllark
+    write(f"{base}.installer.yaml", header + f"""PackageIdentifier: nas2077.TikTokTranscriber
 PackageVersion: {ver}
 InstallerType: inno
 Scope: user
@@ -136,12 +136,12 @@ Installers:
 ManifestType: installer
 ManifestVersion: 1.6.0
 """)
-    write(f"{base}.locale.en-US.yaml", header + f"""PackageIdentifier: nas2077.Syllark
+    write(f"{base}.locale.en-US.yaml", header + f"""PackageIdentifier: nas2077.TikTokTranscriber
 PackageVersion: {ver}
 PackageLocale: en-US
 Publisher: Nas
 PublisherUrl: https://github.com/nas2077
-PackageName: Syllark
+PackageName: TikTok Transcriber
 PackageUrl: {REPO}
 License: MIT
 LicenseUrl: {REPO}/blob/v{ver}/LICENSE
@@ -159,11 +159,11 @@ ManifestVersion: 1.6.0
 
 
 def aur(ver, sums):
-    x64 = need(sums, f"Syllark-{ver}-linux-x86_64.tar.gz")
-    arm = need(sums, f"Syllark-{ver}-linux-aarch64.tar.gz")
+    x64 = need(sums, f"TikTok-Transcriber-{ver}-linux-x86_64.tar.gz")
+    arm = need(sums, f"TikTok-Transcriber-{ver}-linux-aarch64.tar.gz")
     depends = ["nss", "alsa-lib", "libglvnd", "libxkbcommon", "fontconfig", "dbus"]
     write("packaging/aur/PKGBUILD", f"""# Maintainer: Nas <https://github.com/nas2077>
-pkgname=syllark-bin
+pkgname=tiktok-transcriber-bin
 pkgver={ver}
 pkgrel=1
 pkgdesc="{SUMMARY}"
@@ -171,34 +171,34 @@ arch=('x86_64' 'aarch64')
 url="{REPO}"
 license=('MIT')
 depends=({' '.join(f"'{d}'" for d in depends)})
-provides=('syllark')
-conflicts=('syllark')
+provides=('tiktok-transcriber')
+conflicts=('tiktok-transcriber')
 options=('!strip' '!debug')
-source_x86_64=("$pkgname-$pkgver-x86_64.tar.gz::$url/releases/download/v$pkgver/Syllark-$pkgver-linux-x86_64.tar.gz")
-source_aarch64=("$pkgname-$pkgver-aarch64.tar.gz::$url/releases/download/v$pkgver/Syllark-$pkgver-linux-aarch64.tar.gz")
+source_x86_64=("$pkgname-$pkgver-x86_64.tar.gz::$url/releases/download/v$pkgver/TikTok-Transcriber-$pkgver-linux-x86_64.tar.gz")
+source_aarch64=("$pkgname-$pkgver-aarch64.tar.gz::$url/releases/download/v$pkgver/TikTok-Transcriber-$pkgver-linux-aarch64.tar.gz")
 sha256sums_x86_64=('{x64}')
 sha256sums_aarch64=('{arm}')
 
 package() {{
-  local id=io.github.nas2077.Syllark
-  install -d "$pkgdir/opt/syllark" "$pkgdir/usr/bin"
-  cp -a Syllark/. "$pkgdir/opt/syllark/"
-  rm "$pkgdir/opt/syllark/$id.desktop" "$pkgdir/opt/syllark/$id.metainfo.xml" "$pkgdir/opt/syllark/$id.png"
-  ln -s /opt/syllark/Syllark "$pkgdir/usr/bin/syllark"
-  install -Dm644 "Syllark/$id.desktop" "$pkgdir/usr/share/applications/$id.desktop"
-  install -Dm644 "Syllark/$id.metainfo.xml" "$pkgdir/usr/share/metainfo/$id.metainfo.xml"
-  install -Dm644 "Syllark/$id.png" "$pkgdir/usr/share/icons/hicolor/512x512/apps/$id.png"
-  install -Dm644 Syllark/_internal/licenses/LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  local id=io.github.nas2077.TikTokTranscriber
+  install -d "$pkgdir/opt/tiktok-transcriber" "$pkgdir/usr/bin"
+  cp -a tiktok-transcriber/. "$pkgdir/opt/tiktok-transcriber/"
+  rm "$pkgdir/opt/tiktok-transcriber/$id.desktop" "$pkgdir/opt/tiktok-transcriber/$id.metainfo.xml" "$pkgdir/opt/tiktok-transcriber/$id.png"
+  ln -s /opt/tiktok-transcriber/tiktok-transcriber "$pkgdir/usr/bin/tiktok-transcriber"
+  install -Dm644 "tiktok-transcriber/$id.desktop" "$pkgdir/usr/share/applications/$id.desktop"
+  install -Dm644 "tiktok-transcriber/$id.metainfo.xml" "$pkgdir/usr/share/metainfo/$id.metainfo.xml"
+  install -Dm644 "tiktok-transcriber/$id.png" "$pkgdir/usr/share/icons/hicolor/512x512/apps/$id.png"
+  install -Dm644 tiktok-transcriber/_internal/licenses/LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }}
 """)
-    lines = ["pkgbase = syllark-bin", f"\tpkgdesc = {SUMMARY}", f"\tpkgver = {ver}", "\tpkgrel = 1",
+    lines = ["pkgbase = tiktok-transcriber-bin", f"\tpkgdesc = {SUMMARY}", f"\tpkgver = {ver}", "\tpkgrel = 1",
              f"\turl = {REPO}", "\tarch = x86_64", "\tarch = aarch64", "\tlicense = MIT"]
     lines += [f"\tdepends = {d}" for d in depends]
-    lines += ["\tprovides = syllark", "\tconflicts = syllark", "\toptions = !strip", "\toptions = !debug"]
+    lines += ["\tprovides = tiktok-transcriber", "\tconflicts = tiktok-transcriber", "\toptions = !strip", "\toptions = !debug"]
     for arch, digest in (("x86_64", x64), ("aarch64", arm)):
-        lines += [f"\tsource_{arch} = syllark-bin-{ver}-{arch}.tar.gz::{REPO}/releases/download/v{ver}/Syllark-{ver}-linux-{arch}.tar.gz",
+        lines += [f"\tsource_{arch} = tiktok-transcriber-bin-{ver}-{arch}.tar.gz::{REPO}/releases/download/v{ver}/TikTok-Transcriber-{ver}-linux-{arch}.tar.gz",
                   f"\tsha256sums_{arch} = {digest}"]
-    lines += ["", "pkgname = syllark-bin", ""]
+    lines += ["", "pkgname = tiktok-transcriber-bin", ""]
     write("packaging/aur/.SRCINFO", "\n".join(lines))
 
 

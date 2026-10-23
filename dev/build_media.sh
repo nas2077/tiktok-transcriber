@@ -17,7 +17,7 @@ REVISION=46d899d7a02bc63237472cc4897258d5ddf274ac
 SHA256=6626e1f622324597146a8cc90a89bb4c3529f7df55f0a8c998fde55ac5ae4161
 SOURCES=(
     "https://codeload.github.com/FFmpeg/FFmpeg/tar.gz/$REVISION"
-    "https://github.com/nas2077/syllark/releases/download/v0.1.0/FFmpeg-46d899d7a02b-source.tar.gz"
+    "https://github.com/nas2077/tiktok-transcriber/releases/download/v0.1.0/FFmpeg-46d899d7a02b-source.tar.gz"
 )
 
 sha256() {

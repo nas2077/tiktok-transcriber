@@ -31,19 +31,35 @@ jobs:
         run: powershell -ExecutionPolicy Bypass -File dev\build.ps1 -Quiet -Installer
       - name: Start the built app
         run: |
-          $app = Start-Process -FilePath dev\build\dist\Syllark\Syllark.exe -PassThru
+          $app = Start-Process -FilePath 'dev\build\dist\TikTok Transcriber\TikTok Transcriber.exe' -PassThru
           Start-Sleep -Seconds 40
-          if ($app.HasExited) { throw "Syllark exited early with code $($app.ExitCode)" }
+          if ($app.HasExited) { throw "TikTok Transcriber exited early with code $($app.ExitCode)" }
           Stop-Process -Id $app.Id -Force
           $crash = Join-Path $env:LOCALAPPDATA 'TikTok Transcriber\crash.log'
           if (Test-Path $crash) { Get-Content $crash; throw 'crash.log was written' }
-          Write-Host 'Syllark stayed open for 40 seconds.'
+          Write-Host 'TikTok Transcriber stayed open for 40 seconds.'
+      - name: Transcribe real speech with the built app
+        run: python dev/speech_smoke.py 'dev\build\dist\TikTok Transcriber\TikTok Transcriber.exe' small
+      - name: Install, find and uninstall with the installer
+        run: |
+          $setup = Get-ChildItem dev\dist\TikTok-Transcriber-*-windows-x64-setup.exe | Select-Object -First 1
+          $run = Start-Process -FilePath $setup.FullName -Wait -PassThru -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/CURRENTUSER'
+          if ($run.ExitCode -ne 0) { throw "The installer stopped with code $($run.ExitCode)" }
+          $folder = Join-Path $env:LOCALAPPDATA 'Programs\TikTok Transcriber'
+          $app = Join-Path $folder 'TikTok Transcriber.exe'
+          if (-not (Test-Path -LiteralPath $app)) { throw 'The app is not installed' }
+          $menu = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs\TikTok Transcriber.lnk'
+          if (-not (Test-Path -LiteralPath $menu)) { throw 'No Start menu shortcut' }
+          Start-Process -FilePath (Join-Path $folder 'unins000.exe') -Wait -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART'
+          for ($i = 0; $i -lt 30 -and (Test-Path -LiteralPath $app); $i++) { Start-Sleep -Seconds 1 }
+          if (Test-Path -LiteralPath $app) { throw 'Still installed after uninstalling' }
+          Write-Host 'Installed per user, found in the Start menu, uninstalled.'
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: windows-x64
           path: |
-            dev/dist/Syllark-*-windows-x64.zip
-            dev/dist/Syllark-*-windows-x64-setup.exe
+            dev/dist/TikTok-Transcriber-*-windows-x64.zip
+            dev/dist/TikTok-Transcriber-*-windows-x64-setup.exe
           if-no-files-found: error
 
   macos:
@@ -68,19 +84,41 @@ jobs:
         run: bash dev/build.sh --strict
       - name: Start the built app
         run: |
-          dev/build/dist/Syllark.app/Contents/MacOS/Syllark --version
-          dev/build/dist/Syllark.app/Contents/MacOS/Syllark &
+          app="dev/build/dist/TikTok Transcriber.app/Contents/MacOS/TikTok Transcriber"
+          "$app" --version
+          "$app" &
           pid=$!
           sleep 40
-          kill -0 "$pid" || { echo "Syllark exited early"; exit 1; }
+          kill -0 "$pid" || { echo "TikTok Transcriber exited early"; exit 1; }
           kill "$pid"
-          crash="$HOME/Library/Application Support/Syllark/crash.log"
+          crash="$HOME/Library/Application Support/TikTok Transcriber/crash.log"
           if [ -f "$crash" ]; then cat "$crash"; exit 1; fi
-          echo "Syllark stayed open for 40 seconds."
+          echo "TikTok Transcriber stayed open for 40 seconds."
+      - name: Transcribe real speech with the built app (Whisper)
+        run: python dev/speech_smoke.py "dev/build/dist/TikTok Transcriber.app/Contents/MacOS/TikTok Transcriber" small
+      - name: Transcribe real speech with the built app (Natural)
+        if: matrix.arch == 'arm64'
+        run: python dev/speech_smoke.py "dev/build/dist/TikTok Transcriber.app/Contents/MacOS/TikTok Transcriber" qwen3-asr
+      - name: Install and remove with install.sh from a local mirror
+        run: |
+          version=$(sed -n 's/^APP_VERSION = "\(.*\)"$/\1/p' src/tiktok_core.py)
+          (cd dev/dist && shasum -a 256 *.dmg > SHA256SUMS.txt)
+          python -m http.server 8765 --bind 127.0.0.1 --directory dev/dist >/dev/null 2>&1 &
+          sleep 2
+          TIKTOK_TRANSCRIBER_VERSION=$version TIKTOK_TRANSCRIBER_MIRROR=http://127.0.0.1:8765 sh install.sh
+          app=""
+          for dir in /Applications "$HOME/Applications"; do
+            [ -x "$dir/TikTok Transcriber.app/Contents/MacOS/TikTok Transcriber" ] && app="$dir/TikTok Transcriber.app"
+          done
+          [ -n "$app" ] || { echo "install.sh did not install the app"; exit 1; }
+          "$app/Contents/MacOS/TikTok Transcriber" --version
+          TIKTOK_TRANSCRIBER_UNINSTALL=1 sh install.sh
+          [ ! -e "$app" ] || { echo "install.sh did not remove the app"; exit 1; }
+          rm dev/dist/SHA256SUMS.txt
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: macos-${{ matrix.arch }}
-          path: dev/dist/Syllark-*-macos-*.dmg
+          path: dev/dist/TikTok-Transcriber-*-macos-*.dmg
           if-no-files-found: error
 
   linux:
@@ -115,7 +153,7 @@ jobs:
             libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 \
             libegl1 libgl1 libnss3 libxcomposite1 libxdamage1 libxrandr2 \
             libxtst6 libxkbfile1 libdbus-1-3 desktop-file-utils appstream xvfb \
-            zlib1g-dev pkg-config libopus0 libpulse0
+            zlib1g-dev pkg-config libopus0 libpulse0 espeak-ng
           # Qt WebEngine also links minizip; renamed libminizip1t64 on 24.04
           sudo apt-get install -y --no-install-recommends libminizip1t64 || sudo apt-get install -y --no-install-recommends libminizip1
           # renamed libasound2t64 on 24.04
@@ -131,15 +169,15 @@ jobs:
           rm nfpm.tar.gz appimagetool
       - name: Validate desktop entry and AppStream data
         run: |
-          desktop-file-validate packaging/linux/io.github.nas2077.Syllark.desktop
-          appstreamcli validate --no-net --explain packaging/linux/io.github.nas2077.Syllark.metainfo.xml
+          desktop-file-validate packaging/linux/io.github.nas2077.TikTokTranscriber.desktop
+          appstreamcli validate --no-net --explain packaging/linux/io.github.nas2077.TikTokTranscriber.metainfo.xml
       - name: Build bundle and packages
         run: bash dev/build.sh --strict
       - name: Check bundled libraries
         run: |
           # optional parts (CUDA providers, Qt's Wayland compositor) may name
           # libraries a desktop does not have; the window, Qt and media must not
-          cd dev/build/dist/Syllark/_internal
+          cd dev/build/dist/tiktok-transcriber/_internal
           missing=$(find . -name '*.so*' -type f -exec sh -c 'LD_LIBRARY_PATH=$PWD ldd "$1" 2>/dev/null | grep "not found" | sed "s|^|$1: |"' _ {} \; | sort -u)
           [ -z "$missing" ] || { echo "Unresolved (informational):"; echo "$missing"; }
           if echo "$missing" | grep -v Compositor | grep -E 'libQt6(Core|Gui|Widgets|WebEngine|WebChannel|Network)|libqxcb|libqwayland|/av/|libav|libsw'; then
@@ -148,29 +186,114 @@ jobs:
           echo "Window, Qt and media libraries resolve."
       - name: Start the built app
         run: |
-          dev/build/dist/Syllark/Syllark --version
+          dev/build/dist/tiktok-transcriber/tiktok-transcriber --version
           set +e
-          timeout 40 xvfb-run -a dev/build/dist/Syllark/Syllark
+          timeout 40 xvfb-run -a dev/build/dist/tiktok-transcriber/tiktok-transcriber
           code=$?
           set -e
-          crash="$HOME/.local/share/syllark/crash.log"
+          crash="$HOME/.local/share/tiktok-transcriber/crash.log"
           if [ -f "$crash" ]; then cat "$crash"; exit 1; fi
-          [ "$code" = 124 ] || { echo "Syllark exited early with code $code"; exit 1; }
-          echo "Syllark stayed open for 40 seconds."
+          [ "$code" = 124 ] || { echo "TikTok Transcriber exited early with code $code"; exit 1; }
+          echo "TikTok Transcriber stayed open for 40 seconds."
+      - name: Transcribe real speech with the built app (Whisper)
+        run: python dev/speech_smoke.py dev/build/dist/tiktok-transcriber/tiktok-transcriber small
+      - name: Transcribe real speech with the built app (Natural)
+        if: matrix.arch == 'x86_64'
+        run: python dev/speech_smoke.py dev/build/dist/tiktok-transcriber/tiktok-transcriber qwen3-asr
+      - name: Install and remove with install.sh from a local mirror
+        run: |
+          version=$(sed -n 's/^APP_VERSION = "\(.*\)"$/\1/p' src/tiktok_core.py)
+          (cd dev/dist && sha256sum *.tar.gz > SHA256SUMS.txt)
+          python -m http.server 8765 --bind 127.0.0.1 --directory dev/dist >/dev/null 2>&1 &
+          sleep 2
+          TIKTOK_TRANSCRIBER_VERSION=$version TIKTOK_TRANSCRIBER_MIRROR=http://127.0.0.1:8765 sh install.sh
+          "$HOME/.local/bin/tiktok-transcriber" --version
+          desktop-file-validate "$HOME/.local/share/applications/io.github.nas2077.TikTokTranscriber.desktop"
+          TIKTOK_TRANSCRIBER_UNINSTALL=1 sh install.sh
+          [ ! -e "$HOME/.local/bin/tiktok-transcriber" ] || { echo "install.sh did not remove the command"; exit 1; }
+          rm dev/dist/SHA256SUMS.txt
       - name: Inspect packages
         run: |
           dpkg-deb --info dev/dist/*.deb
-          dpkg-deb --contents dev/dist/*.deb | grep -E 'usr/bin/syllark|applications/io.github.nas2077.Syllark.desktop'
+          dpkg-deb --contents dev/dist/*.deb | grep -E 'usr/bin/tiktok-transcriber|applications/io.github.nas2077.TikTokTranscriber.desktop'
           ls -l dev/dist
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: linux-${{ matrix.arch }}
           path: |
-            dev/dist/Syllark-*
+            dev/dist/TikTok-Transcriber-*
             dev/dist/*.deb
             dev/dist/*.rpm
             dev/dist/*.pkg.tar.zst
           if-no-files-found: error
+
+  distros:
+    # each package on the distributions it is for, in a clean container:
+    # install with the system's package manager, then start the app
+    needs: linux
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {image: 'ubuntu:22.04', kind: deb, arch: x86_64, runner: ubuntu-24.04}
+          - {image: 'ubuntu:24.04', kind: deb, arch: x86_64, runner: ubuntu-24.04}
+          - {image: 'debian:12', kind: deb, arch: x86_64, runner: ubuntu-24.04}
+          - {image: 'debian:13', kind: deb, arch: x86_64, runner: ubuntu-24.04}
+          - {image: 'linuxmintd/mint22-amd64', kind: deb, arch: x86_64, runner: ubuntu-24.04}
+          - {image: 'fedora:42', kind: rpm, arch: x86_64, runner: ubuntu-24.04}
+          - {image: 'rockylinux:9', kind: rpm, arch: x86_64, runner: ubuntu-24.04}
+          - {image: 'opensuse/tumbleweed', kind: rpm, arch: x86_64, runner: ubuntu-24.04}
+          - {image: 'archlinux:latest', kind: arch, arch: x86_64, runner: ubuntu-24.04}
+          - {image: 'fedora:42', kind: appimage, arch: x86_64, runner: ubuntu-24.04}
+          - {image: 'debian:12', kind: appimage, arch: x86_64, runner: ubuntu-24.04}
+          - {image: 'ubuntu:24.04', kind: deb, arch: aarch64, runner: ubuntu-24.04-arm}
+          - {image: 'debian:13', kind: deb, arch: aarch64, runner: ubuntu-24.04-arm}
+          - {image: 'fedora:42', kind: rpm, arch: aarch64, runner: ubuntu-24.04-arm}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    container: ${{ matrix.image }}
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: linux-${{ matrix.arch }}
+          path: pkg
+      - name: Install with the package manager
+        shell: sh
+        run: |
+          set -eu
+          case "${{ matrix.kind }}" in
+            deb)
+              apt-get update
+              DEBIAN_FRONTEND=noninteractive apt-get install -y ./pkg/*.deb ;;
+            rpm)
+              if command -v dnf >/dev/null; then dnf install -y ./pkg/*.rpm
+              else zypper --non-interactive install --allow-unsigned-rpm ./pkg/*.rpm; fi ;;
+            arch)
+              pacman -Syu --noconfirm
+              pacman -U --noconfirm ./pkg/*.pkg.tar.zst ;;
+            appimage)
+              # the libraries a desktop already has, then the AppImage itself
+              if command -v dnf >/dev/null; then
+                dnf install -y nss alsa-lib mesa-libGL mesa-libEGL libxkbcommon fontconfig dbus-libs
+              else
+                apt-get update
+                DEBIAN_FRONTEND=noninteractive apt-get install -y libnss3 libasound2 libgl1 libegl1 libxkbcommon0 libfontconfig1 libdbus-1-3
+              fi
+              chmod +x pkg/*.AppImage
+              printf '#!/bin/sh\nAPPIMAGE_EXTRACT_AND_RUN=1 exec %s "$@"\n' "$(ls "$PWD"/pkg/*.AppImage)" > /usr/local/bin/tiktok-transcriber
+              chmod +x /usr/local/bin/tiktok-transcriber ;;
+          esac
+      - name: Start the installed app
+        shell: sh
+        run: |
+          set -u
+          tiktok-transcriber --version
+          QT_QPA_PLATFORM=offscreen timeout 40 tiktok-transcriber
+          code=$?
+          crash="$HOME/.local/share/tiktok-transcriber/crash.log"
+          if [ -f "$crash" ]; then cat "$crash"; exit 1; fi
+          [ "$code" = 124 ] || { echo "TikTok Transcriber exited early with code $code"; exit 1; }
+          echo "Installed on ${{ matrix.image }} (${{ matrix.kind }}) and stayed open for 40 seconds."
 
   flatpak:
     needs: linux
@@ -188,13 +311,13 @@ jobs:
       - name: Place the bundle beside the manifest
         id: bundle
         run: |
-          archive=$(ls linux/Syllark-*-linux-x86_64.tar.gz)
-          cp "$archive" packaging/linux/flatpak/syllark-bundle.tar.gz
-          version=$(basename "$archive" | sed 's/^Syllark-\(.*\)-linux-x86_64.tar.gz$/\1/')
-          echo "name=Syllark-$version-linux-x86_64.flatpak" >> "$GITHUB_OUTPUT"
+          archive=$(ls linux/TikTok-Transcriber-*-linux-x86_64.tar.gz)
+          cp "$archive" packaging/linux/flatpak/tiktok-transcriber-bundle.tar.gz
+          version=$(basename "$archive" | sed 's/^TikTok-Transcriber-\(.*\)-linux-x86_64.tar.gz$/\1/')
+          echo "name=TikTok-Transcriber-$version-linux-x86_64.flatpak" >> "$GITHUB_OUTPUT"
       - uses: flatpak/flatpak-github-actions/flatpak-builder@79327416609af08178ad73b352877e51450790b3 # v6.8
         with:
-          manifest-path: packaging/linux/flatpak/io.github.nas2077.Syllark.yml
+          manifest-path: packaging/linux/flatpak/io.github.nas2077.TikTokTranscriber.yml
           bundle: ${{ steps.bundle.outputs.name }}
           artifact-name: flatpak-x86_64
           cache: false
@@ -216,7 +339,7 @@ jobs:
         run: |
           python -m venv /tmp/try
           /tmp/try/bin/pip install --disable-pip-version-check -q dist/*.whl
-          /tmp/try/bin/syllark --version
+          /tmp/try/bin/tiktok-transcriber --version
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: python
@@ -256,6 +379,6 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           [ "${GITHUB_REF_NAME}" = "v$VERSION" ] || { echo "tag ${GITHUB_REF_NAME} does not match version $VERSION"; exit 1; }
-          gh release create "v$VERSION" --draft --verify-tag --title "Syllark $VERSION" \
-            --notes "See [CHANGELOG.md](https://github.com/nas2077/syllark/blob/v$VERSION/CHANGELOG.md). Verify downloads with SHA256SUMS.txt." \
+          gh release create "v$VERSION" --draft --verify-tag --title "TikTok Transcriber $VERSION" \
+            --notes "See [CHANGELOG.md](https://github.com/nas2077/tiktok-transcriber/blob/v$VERSION/CHANGELOG.md). Verify downloads with SHA256SUMS.txt." \
             assets/*

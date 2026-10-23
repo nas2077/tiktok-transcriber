@@ -31,7 +31,8 @@ def prepare_window_engine():
         return
     # the LGPL Qt bindings, even when PyQt is installed next to them
     os.environ.setdefault("QT_API", "pyside6")
-    blocked = os.path.exists("/.flatpak-info")
+    # chromium also refuses its sandbox to root (containers, some live systems)
+    blocked = os.path.exists("/.flatpak-info") or os.geteuid() == 0
     try:
         with open("/proc/sys/kernel/apparmor_restrict_unprivileged_userns") as f:
             blocked = blocked or f.read().strip() == "1"
@@ -64,7 +65,7 @@ def storage_name(windows_name):
     windows keeps its old folder name, so nothing saved there is lost. the
     other systems start fresh and follow their own naming habits.
     """
-    return windows_name if WINDOWS else "Syllark" if MAC else "syllark"
+    return windows_name if WINDOWS else "TikTok Transcriber" if MAC else "tiktok-transcriber"
 
 
 def documents_dir():
@@ -195,7 +196,7 @@ def _start_inhibitor():
     if MAC:
         command = ["caffeinate", "-i", "-w", str(os.getpid())]
     else:
-        command = ["systemd-inhibit", "--what=idle:sleep", "--who=Syllark",
+        command = ["systemd-inhibit", "--what=idle:sleep", "--who=TikTok Transcriber",
                    "--why=Transcribing", "--mode=block", "sleep", "infinity"]
     try:
         return subprocess.Popen(command, env=_clean_environment(), stdin=subprocess.DEVNULL,

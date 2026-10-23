@@ -116,5 +116,5 @@ def check(exe):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("exe", nargs="?", default=str(ROOT / "dev/build/syllark-dist/Syllark/Syllark.exe"))
+    parser.add_argument("exe", nargs="?", default=str(ROOT / "dev/build/tiktok-transcriber-dist/TikTok Transcriber/TikTok Transcriber.exe"))
     check(Path(parser.parse_args().exe).resolve())

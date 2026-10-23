@@ -4,7 +4,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: Syllark version and Windows version
+      label: TikTok Transcriber version and Windows version
     validations:
       required: true
   - type: textarea

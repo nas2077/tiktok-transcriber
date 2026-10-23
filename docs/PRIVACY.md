@@ -1,6 +1,6 @@
 # Privacy and network access
 
-Syllark reads public TikTok video/profile metadata and downloads selected media.
+TikTok Transcriber reads public TikTok video/profile metadata and downloads selected media.
 It does not read browser sessions, import account cookies, request TikTok login,
 or upload audio to a transcription service. Recognition runs on your computer.
 Ordinary anonymous website cookies may be used within a public HTTP session;
@@ -16,7 +16,7 @@ these are unrelated to your browser or TikTok account.
 | Google Fonts | Inter font requested by the interface |
 
 Downloaded models and libraries are reused. Opening the app alone does not
-start a model download. Syllark has no analytics or remote crash-reporting
+start a model download. TikTok Transcriber has no analytics or remote crash-reporting
 endpoint. External errors retain their original diagnostic text.
 
 ## Local files
@@ -24,7 +24,7 @@ endpoint. External errors retain their original diagnostic text.
 Transcripts go to `Documents\TikTok Transcripts` by default, or to the folder
 you choose. Settings, the WebView cache, logs, and optional Whisper GPU libraries
 use `%LOCALAPPDATA%\TikTok Transcriber`. This established storage name is retained
-across the Syllark rename. Hugging Face cache settings are respected.
+across the TikTok Transcriber rename. Hugging Face cache settings are respected.
 
 Uninstall by deleting the unpacked application folder. Remove its settings/cache
 folder and downloaded models separately if no longer needed. Your transcripts

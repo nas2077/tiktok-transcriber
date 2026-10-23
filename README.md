@@ -1,11 +1,11 @@
-<p align="center"><img src=".github/assets/syllark.svg" width="128" height="128" alt="Syllark"></p>
+<p align="center"><img src=".github/assets/icon.svg" width="128" height="128" alt="TikTok Transcriber"></p>
 
-<h1 align="center">Syllark.</h1>
+<h1 align="center">TikTok Transcriber.</h1>
 <p align="center">Public clips. Clear text. On your computer.</p>
 
-[![Checks](https://github.com/nas2077/syllark/actions/workflows/checks.yml/badge.svg)](https://github.com/nas2077/syllark/actions/workflows/checks.yml) [![CodeQL](https://github.com/nas2077/syllark/actions/workflows/codeql.yml/badge.svg)](https://github.com/nas2077/syllark/actions/workflows/codeql.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-a35139.svg)](LICENSE)
+[![Checks](https://github.com/nas2077/tiktok-transcriber/actions/workflows/checks.yml/badge.svg)](https://github.com/nas2077/tiktok-transcriber/actions/workflows/checks.yml) [![CodeQL](https://github.com/nas2077/tiktok-transcriber/actions/workflows/codeql.yml/badge.svg)](https://github.com/nas2077/tiktok-transcriber/actions/workflows/codeql.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-a35139.svg)](LICENSE)
 
-Syllark turns public TikTok videos and profiles into readable transcripts on Windows, macOS, and Linux. Recognition runs locally with integrated Qwen and Whisper models. Paste a link, choose an output folder, and start.
+TikTok Transcriber turns public TikTok videos and profiles into readable transcripts on Windows, macOS, and Linux. Recognition runs locally with integrated Qwen and Whisper models. Paste a link, choose an output folder, and start.
 
 ## Features
 
@@ -19,32 +19,32 @@ Syllark turns public TikTok videos and profiles into readable transcripts on Win
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset=".github/assets/screenshot-light.png">
-  <img src=".github/assets/screenshot-dark.png" alt="Syllark on Windows" width="1120">
+  <img src=".github/assets/screenshot-dark.png" alt="TikTok Transcriber on Windows" width="1120">
 </picture>
 
 ## Download
 
 | System | Packages |
 |---|---|
-| **Windows** 10/11 · x64 | [Installer](https://github.com/nas2077/syllark/releases/download/v0.2.0/Syllark-0.2.0-windows-x64-setup.exe) · [Portable ZIP](https://github.com/nas2077/syllark/releases/download/v0.2.0/Syllark-0.2.0-windows-x64.zip) |
-| **macOS** 11+ | [Apple silicon](https://github.com/nas2077/syllark/releases/download/v0.2.0/Syllark-0.2.0-macos-arm64.dmg) · [Intel](https://github.com/nas2077/syllark/releases/download/v0.2.0/Syllark-0.2.0-macos-x64.dmg) |
-| **Linux** · x86_64 | [AppImage](https://github.com/nas2077/syllark/releases/download/v0.2.0/Syllark-0.2.0-linux-x86_64.AppImage) · [.deb](https://github.com/nas2077/syllark/releases/download/v0.2.0/syllark_0.2.0-1_amd64.deb) · [.rpm](https://github.com/nas2077/syllark/releases/download/v0.2.0/syllark-0.2.0-1.x86_64.rpm) · [Arch](https://github.com/nas2077/syllark/releases/download/v0.2.0/syllark-0.2.0-1-x86_64.pkg.tar.zst) · [Flatpak](https://github.com/nas2077/syllark/releases/download/v0.2.0/Syllark-0.2.0-linux-x86_64.flatpak) · [.tar.gz](https://github.com/nas2077/syllark/releases/download/v0.2.0/Syllark-0.2.0-linux-x86_64.tar.gz) |
-| **Linux** · ARM64 | [AppImage](https://github.com/nas2077/syllark/releases/download/v0.2.0/Syllark-0.2.0-linux-aarch64.AppImage) · [.deb](https://github.com/nas2077/syllark/releases/download/v0.2.0/syllark_0.2.0-1_arm64.deb) · [.rpm](https://github.com/nas2077/syllark/releases/download/v0.2.0/syllark-0.2.0-1.aarch64.rpm) · [Arch](https://github.com/nas2077/syllark/releases/download/v0.2.0/syllark-0.2.0-1-aarch64.pkg.tar.zst) · [.tar.gz](https://github.com/nas2077/syllark/releases/download/v0.2.0/Syllark-0.2.0-linux-aarch64.tar.gz) |
+| **Windows** 10/11 · x64 | [Installer](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-windows-x64-setup.exe) · [Portable ZIP](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-windows-x64.zip) |
+| **macOS** 11+ | [Apple silicon](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-macos-arm64.dmg) · [Intel](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-macos-x64.dmg) |
+| **Linux** · x86_64 | [AppImage](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-linux-x86_64.AppImage) · [.deb](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/tiktok-transcriber_0.2.0-1_amd64.deb) · [.rpm](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/tiktok-transcriber-0.2.0-1.x86_64.rpm) · [Arch](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/tiktok-transcriber-0.2.0-1-x86_64.pkg.tar.zst) · [Flatpak](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-linux-x86_64.flatpak) · [.tar.gz](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-linux-x86_64.tar.gz) |
+| **Linux** · ARM64 | [AppImage](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-linux-aarch64.AppImage) · [.deb](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/tiktok-transcriber_0.2.0-1_arm64.deb) · [.rpm](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/tiktok-transcriber-0.2.0-1.aarch64.rpm) · [Arch](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/tiktok-transcriber-0.2.0-1-aarch64.pkg.tar.zst) · [.tar.gz](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-linux-aarch64.tar.gz) |
 
-Every package carries its own Python and speech engines. [Releases](https://github.com/nas2077/syllark/releases) list checksums and release notes.
+Every package carries its own Python and speech engines. [Releases](https://github.com/nas2077/tiktok-transcriber/releases) list checksums and release notes.
 
 ### Install from a terminal
 
 macOS and Linux, no root needed:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/nas2077/syllark/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/nas2077/tiktok-transcriber/main/install.sh | sh
 ```
 
 Windows, in PowerShell, no administrator rights needed:
 
 ```powershell
-irm https://raw.githubusercontent.com/nas2077/syllark/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/nas2077/tiktok-transcriber/main/install.ps1 | iex
 ```
 
 Both scripts download the latest release and check its SHA-256 before installing.
@@ -54,36 +54,36 @@ Both scripts download the latest release and check its SHA-256 before installing
 
 ```bash
 # macOS · Homebrew
-brew tap nas2077/syllark https://github.com/nas2077/syllark
-brew install --cask syllark
+brew tap nas2077/tiktok-transcriber https://github.com/nas2077/tiktok-transcriber
+brew install --cask tiktok-transcriber
 ```
 
 ```powershell
 # Windows · winget
-winget install nas2077.Syllark
+winget install nas2077.TikTokTranscriber
 # Windows · Scoop
-scoop bucket add syllark https://github.com/nas2077/syllark
-scoop install syllark
+scoop bucket add tiktok-transcriber https://github.com/nas2077/tiktok-transcriber
+scoop install tiktok-transcriber
 ```
 
 ```bash
 # Debian, Ubuntu, Linux Mint, Pop!_OS, elementary OS, Zorin OS, Kali
-sudo apt install ./syllark_0.2.0-1_amd64.deb
+sudo apt install ./tiktok-transcriber_0.2.0-1_amd64.deb
 # Fedora, RHEL, Rocky Linux, AlmaLinux
-sudo dnf install ./syllark-0.2.0-1.x86_64.rpm
+sudo dnf install ./tiktok-transcriber-0.2.0-1.x86_64.rpm
 # openSUSE
-sudo zypper install ./syllark-0.2.0-1.x86_64.rpm
+sudo zypper install ./tiktok-transcriber-0.2.0-1.x86_64.rpm
 # Arch Linux, Manjaro, EndeavourOS
-yay -S syllark-bin
+yay -S tiktok-transcriber-bin
 # Any distribution · Flatpak (with Flathub set up for its runtime)
-flatpak install --user ./Syllark-0.2.0-linux-x86_64.flatpak
+flatpak install --user ./TikTok-Transcriber-0.2.0-linux-x86_64.flatpak
 # Any distribution · AppImage
-chmod +x Syllark-0.2.0-linux-x86_64.AppImage && ./Syllark-0.2.0-linux-x86_64.AppImage
+chmod +x TikTok-Transcriber-0.2.0-linux-x86_64.AppImage && ./TikTok-Transcriber-0.2.0-linux-x86_64.AppImage
 ```
 
 ```bash
 # Any system with Python 3.11 or newer
-pipx install syllark        # or: uv tool install syllark
+pipx install tiktok-transcriber        # or: uv tool install tiktok-transcriber
 ```
 
 </details>
@@ -113,7 +113,7 @@ Natural is the default for new settings and includes CPU/Vulkan support. Whisper
 
 ## Privacy
 
-Syllark uses public TikTok access without sign-in, browser-session reads, or imported account cookies. Audio is not uploaded to a transcription service. Network access is used for TikTok content, model/library downloads, and the interface font. [Full privacy and storage details](docs/PRIVACY.md).
+TikTok Transcriber uses public TikTok access without sign-in, browser-session reads, or imported account cookies. Audio is not uploaded to a transcription service. Network access is used for TikTok content, model/library downloads, and the interface font. [Full privacy and storage details](docs/PRIVACY.md).
 
 ## Development
 

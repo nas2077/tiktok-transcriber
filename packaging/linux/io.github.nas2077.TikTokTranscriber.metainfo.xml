@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- AppStream metadata: software centers (GNOME Software, KDE Discover, Flathub) read it. -->
 <component type="desktop-application">
-  <id>io.github.nas2077.Syllark</id>
-  <name>Syllark</name>
+  <id>io.github.nas2077.TikTokTranscriber</id>
+  <name>TikTok Transcriber</name>
   <summary>Readable transcripts from public clips, on your computer</summary>
   <developer id="io.github.nas2077">
     <name>Nas</name>
@@ -11,7 +11,7 @@
   <project_license>MIT</project_license>
   <description>
     <p>
-      Syllark turns public TikTok videos and profiles into readable transcripts.
+      TikTok Transcriber turns public TikTok videos and profiles into readable transcripts.
       Recognition runs locally with integrated Qwen and Whisper models: audio is
       not uploaded to a transcription service.
     </p>
@@ -23,12 +23,12 @@
       <li>Fourteen interface languages, dark and light themes, reduced motion</li>
     </ul>
   </description>
-  <launchable type="desktop-id">io.github.nas2077.Syllark.desktop</launchable>
-  <url type="homepage">https://github.com/nas2077/syllark</url>
-  <url type="bugtracker">https://github.com/nas2077/syllark/issues</url>
+  <launchable type="desktop-id">io.github.nas2077.TikTokTranscriber.desktop</launchable>
+  <url type="homepage">https://github.com/nas2077/tiktok-transcriber</url>
+  <url type="bugtracker">https://github.com/nas2077/tiktok-transcriber/issues</url>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/nas2077/syllark/main/.github/assets/screenshot-dark.png</image>
+      <image>https://raw.githubusercontent.com/nas2077/tiktok-transcriber/main/.github/assets/screenshot-dark.png</image>
       <caption>Transcribing a public profile</caption>
     </screenshot>
   </screenshots>

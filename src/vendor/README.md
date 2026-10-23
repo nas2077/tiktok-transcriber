@@ -1,7 +1,7 @@
 # Nas design system
 
 The bundled Nas kit provides semantic colors, tactile controls, and Orbi pixel art.
-The public API and selectors use English names. Syllark selects the `workshop`
+The public API and selectors use English names. TikTok Transcriber selects the `workshop`
 preset with compact density and quiet motion. Application layout remains in
 `src/ui.html`.
 

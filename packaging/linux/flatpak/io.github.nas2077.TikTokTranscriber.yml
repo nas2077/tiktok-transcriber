@@ -1,0 +1,35 @@
+# Flatpak of the Linux bundle. The release workflow puts the bundle archive
+# next to this file as tiktok-transcriber-bundle.tar.gz before running flatpak-builder.
+id: io.github.nas2077.TikTokTranscriber
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+command: tiktok-transcriber
+finish-args:
+  - --share=network
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  # the output folder can be anywhere the user picks, Documents by default
+  - --filesystem=home
+modules:
+  - name: tiktok-transcriber
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/lib/tiktok-transcriber /app/bin
+      - cp -a bundle/. /app/lib/tiktok-transcriber/
+      - ln -s /app/lib/tiktok-transcriber/tiktok-transcriber /app/bin/tiktok-transcriber
+      - install -Dm644 io.github.nas2077.TikTokTranscriber.desktop /app/share/applications/io.github.nas2077.TikTokTranscriber.desktop
+      - install -Dm644 io.github.nas2077.TikTokTranscriber.metainfo.xml /app/share/metainfo/io.github.nas2077.TikTokTranscriber.metainfo.xml
+      - install -Dm644 icon.png /app/share/icons/hicolor/512x512/apps/io.github.nas2077.TikTokTranscriber.png
+    sources:
+      - type: archive
+        path: tiktok-transcriber-bundle.tar.gz
+        dest: bundle
+      - type: file
+        path: ../io.github.nas2077.TikTokTranscriber.desktop
+      - type: file
+        path: ../io.github.nas2077.TikTokTranscriber.metainfo.xml
+      - type: file
+        path: ../../../src/icon.png

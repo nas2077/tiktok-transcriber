@@ -3,7 +3,7 @@
 The application reads audio through PyAV. PyPI's PyAV wheels include FFmpeg
 libraries with additional codec-license considerations: the macOS and Linux
 wheels, for example, are configured with x264 and x265, which are GPL. Every
-Syllark package therefore uses LGPL-only FFmpeg libraries without x264/x265.
+TikTok Transcriber package therefore uses LGPL-only FFmpeg libraries without x264/x265.
 
 ## macOS and Linux
 
@@ -14,7 +14,7 @@ compiles it with `--enable-version3 --disable-autodetect`, threads and zlib, and
 no external codec library. PyAV 18.1.0 is then compiled from its PyPI source
 against those libraries. The script refuses a result whose configuration
 contains `--enable-gpl`, `--enable-nonfree`, x264 or x265. FFmpeg's own decoders
-cover the AAC, MP3, Opus, Vorbis and FLAC audio Syllark reads.
+cover the AAC, MP3, Opus, Vorbis and FLAC audio TikTok Transcriber reads.
 
 The Linux window uses Qt through PySide6, which is LGPL; PyQt is not bundled.
 
@@ -46,7 +46,7 @@ Build outputs and input archives stay under ignored `dev/media`.
 - [FFmpeg source at the distributed revision](https://github.com/FFmpeg/FFmpeg/tree/46d899d7a0).
 - [BtbN build scripts and dependency source definitions](https://github.com/BtbN/FFmpeg-Builds/tree/63ac3265b0789ea16c7b1f8351cd2ad195a28722).
 - [PyAV 18.1.0 source](https://github.com/PyAV-Org/PyAV/tree/v18.1.0).
-- Syllark's import-table changes and packaging instructions: `dev/prepare_media.py`.
+- TikTok Transcriber's import-table changes and packaging instructions: `dev/prepare_media.py`.
 
 The BtbN tree contains the component source URLs, patches, configuration, and
 container build steps. Its relevant target is `win64`, variant `lgpl-shared`,

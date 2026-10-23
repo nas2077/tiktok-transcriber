@@ -1,4 +1,4 @@
-# `pipx install syllark` / `uv tool install syllark` and `pip install .`.
+# `pipx install tiktok-transcriber` / `uv tool install tiktok-transcriber` and `pip install .`.
 # The desktop packages in Releases are built separately with PyInstaller
 # (dev/build.spec); this file only describes the Python package.
 [build-system]
@@ -6,7 +6,7 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "syllark"
+name = "tiktok-transcriber"
 dynamic = ["version"]
 description = "Readable transcripts from public TikTok clips and profiles, with local Qwen and Whisper."
 readme = "README.md"
@@ -41,22 +41,22 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/nas2077/syllark"
-Releases = "https://github.com/nas2077/syllark/releases"
-Issues = "https://github.com/nas2077/syllark/issues"
+Homepage = "https://github.com/nas2077/tiktok-transcriber"
+Releases = "https://github.com/nas2077/tiktok-transcriber/releases"
+Issues = "https://github.com/nas2077/tiktok-transcriber/issues"
 
 [project.gui-scripts]
-syllark = "syllark.app:run"
+tiktok-transcriber = "tiktok_transcriber.app:run"
 
 [tool.setuptools]
 # The modules live in src/ and import each other by plain name; installed,
-# they sit together in one `syllark` folder that app.py puts on the path.
-package-dir = { "syllark" = "src" }
-packages = ["syllark"]
+# they sit together in one `tiktok-transcriber` folder that app.py puts on the path.
+package-dir = { "tiktok_transcriber" = "src" }
+packages = ["tiktok_transcriber"]
 include-package-data = false
 
 [tool.setuptools.package-data]
-syllark = [
+tiktok_transcriber = [
     "*.html", "*.js", "*.ico", "*.png",
     "locales/*.json",
     "vendor/*.js", "vendor/*.css",
@@ -64,4 +64,4 @@ syllark = [
 ]
 
 [tool.setuptools.dynamic]
-version = { attr = "syllark.tiktok_core.APP_VERSION" }
+version = { attr = "tiktok_transcriber.tiktok_core.APP_VERSION" }

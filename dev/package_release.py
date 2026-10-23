@@ -7,10 +7,10 @@ from zipfile import ZIP_DEFLATED, ZipFile
 
 def package(folder, destination):
     folder, destination = Path(folder).resolve(), Path(destination).resolve()
-    binary = folder / "Syllark.exe"
+    binary = folder / "TikTok Transcriber.exe"
     runtime = folder / "runtime"
     if not binary.is_file() or not (runtime / "ui.html").is_file():
-        raise ValueError("Expected Syllark.exe and runtime/ui.html")
+        raise ValueError("Expected TikTok Transcriber.exe and runtime/ui.html")
     # Only these two app artifacts: never settings, sources, backups or user files.
     files = [binary] + sorted(p for p in runtime.rglob("*") if p.is_file())
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -18,12 +18,12 @@ def package(folder, destination):
     try:
         with ZipFile(temporary, "w", ZIP_DEFLATED, compresslevel=6) as archive:
             for path in files:
-                archive.write(path, "Syllark/" + path.relative_to(folder).as_posix())
+                archive.write(path, "TikTok Transcriber/" + path.relative_to(folder).as_posix())
         with ZipFile(temporary) as archive:
             names = archive.namelist()
             assert len(names) == len(files)
-            assert "Syllark/runtime/ui.html" in names
-            assert "Syllark/runtime/locales/it.json" in names
+            assert "TikTok Transcriber/runtime/ui.html" in names
+            assert "TikTok Transcriber/runtime/locales/it.json" in names
             assert archive.testzip() is None, "Corrupt ZIP entry"
         os.replace(temporary, destination)
     finally:

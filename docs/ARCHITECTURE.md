@@ -1,6 +1,6 @@
 # Architecture
 
-Syllark uses Python for media processing and a local HTML interface rendered
+TikTok Transcriber uses Python for media processing and a local HTML interface rendered
 by the system's web view: WebView2 on Windows, WebKit on macOS, Qt WebEngine on
 Linux. It has no application server.
 
@@ -56,5 +56,5 @@ download callback. Expensive work runs outside the interface thread. Settings
 updates use a lock and atomic replacement of the disk snapshot.
 
 The Nas kit provides dark/light semantic tokens, tactile controls, integer-scale
-pixel artwork, and reduced motion. Product branding belongs to Syllark; the Nas
+pixel artwork, and reduced motion. Product branding belongs to TikTok Transcriber; the Nas
 signature identifies its author and Orbi remains a supporting mascot.

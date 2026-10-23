@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build Syllark on macOS or Linux: environment, licenses, PyInstaller, packages.
+# Build TikTok Transcriber on macOS or Linux: environment, licenses, PyInstaller, packages.
 # Windows uses dev/build.ps1. Packages land in dev/dist; see docs/RELEASING.md.
 set -euo pipefail
 
