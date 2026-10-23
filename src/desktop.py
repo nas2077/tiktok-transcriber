@@ -47,6 +47,22 @@ def prepare_window_engine():
         os.environ.setdefault("QTWEBENGINE_DISABLE_SANDBOX", "1")
 
 
+def name_window():
+    """
+    the desktop pairs a window with its menu entry and icon by this name.
+    without it the window was "tiktok-transcriber" to wayland and gnome and
+    kde showed a generic icon next to it, apart from the app's own entry.
+    """
+    if not LINUX:
+        return
+    try:
+        from PySide6.QtGui import QGuiApplication
+
+        QGuiApplication.setDesktopFileName("io.github.nas2077.TikTokTranscriber")
+    except Exception:
+        pass   # from source with GTK there is no Qt to tell
+
+
 # ------------------------------------------------------------------ folders
 
 

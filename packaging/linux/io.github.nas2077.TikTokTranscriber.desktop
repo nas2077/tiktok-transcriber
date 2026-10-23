@@ -10,4 +10,4 @@ Terminal=false
 Categories=AudioVideo;Audio;Utility;
 Keywords=transcription;transcribe;speech;whisper;qwen;tiktok;subtitles;
 StartupNotify=true
-StartupWMClass=TikTok Transcriber
+StartupWMClass=tiktok-transcriber

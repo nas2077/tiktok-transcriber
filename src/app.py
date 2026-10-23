@@ -1211,6 +1211,7 @@ def main():
     # Opening Options must not start downloading the default before the user
     # can choose a smaller model, or before an invalid link has been rejected.
     bridge.start()
+    desktop.name_window()
     webview.start(
         gui=window_engine(), debug=False, private_mode=False, storage_path=WEBVIEW_CACHE,
         icon=os.path.join(HERE, "icon.png") if desktop.LINUX else None,
