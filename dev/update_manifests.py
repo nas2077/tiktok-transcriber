@@ -161,7 +161,7 @@ ManifestVersion: 1.6.0
 def aur(ver, sums):
     x64 = need(sums, f"TikTok-Transcriber-{ver}-linux-x86_64.tar.gz")
     arm = need(sums, f"TikTok-Transcriber-{ver}-linux-aarch64.tar.gz")
-    depends = ["nss", "alsa-lib", "libglvnd", "libxkbcommon", "fontconfig", "dbus"]
+    depends = ["nss", "alsa-lib", "libglvnd", "libxkbcommon", "fontconfig", "dbus", "wayland"]
     write("packaging/aur/PKGBUILD", f"""# Maintainer: Nas <https://github.com/nas2077>
 pkgname=tiktok-transcriber-bin
 pkgver={ver}

@@ -14,7 +14,8 @@ downloaded user media, or build cache. Download runnable packages from
 | Any system with Python 3.11+ | `tiktok_transcriber-<version>-py3-none-any.whl` and the source archive |
 
 Linux x86_64 packages are built on Ubuntu 22.04 and need glibc 2.35 or newer
-(Ubuntu 22.04, Debian 12, Fedora 36, RHEL/Rocky/Alma 9 or newer). Linux aarch64
+(Ubuntu 22.04, Debian 12, Fedora 36, RHEL/Rocky/Alma 10 or newer; RHEL 9 has
+glibc 2.34 and needs the Flatpak). Linux aarch64
 packages are built on Ubuntu 24.04, because Qt publishes its ARM wheels for glibc
 2.39 only: Ubuntu 24.04, Debian 13 (and Raspberry Pi OS based on it), Fedora 40
 or newer. The x86_64 Flatpak carries its own runtime and also works on older or

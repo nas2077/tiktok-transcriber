@@ -69,7 +69,7 @@ scoop install tiktok-transcriber
 ```bash
 # Debian, Ubuntu, Linux Mint, Pop!_OS, elementary OS, Zorin OS, Kali
 sudo apt install ./tiktok-transcriber_0.2.0-1_amd64.deb
-# Fedora, RHEL, Rocky Linux, AlmaLinux
+# Fedora, and RHEL, Rocky Linux or AlmaLinux 10
 sudo dnf install ./tiktok-transcriber-0.2.0-1.x86_64.rpm
 # openSUSE
 sudo zypper install ./tiktok-transcriber-0.2.0-1.x86_64.rpm
@@ -88,7 +88,7 @@ pipx install tiktok-transcriber        # or: uv tool install tiktok-transcriber
 
 </details>
 
-Requirements: Windows 10/11 x64 with WebView2; macOS 11 or newer; Linux with X11 or Wayland and glibc 2.35+ (x86_64) or 2.39+ (ARM64), such as Ubuntu 22.04/24.04, Debian 12/13, or Fedora 36/40 and newer. The Flatpak also runs on older and immutable systems. Packages are not signed with a publisher certificate: Windows SmartScreen may warn, and macOS asks you to choose **Open Anyway** in System Settings › Privacy & Security the first time. See [release verification](docs/RELEASING.md) before running a downloaded build.
+Requirements: Windows 10/11 x64 with WebView2; macOS 11 or newer; Linux with X11 or Wayland and glibc 2.35+ (x86_64) or 2.39+ (ARM64), such as Ubuntu 22.04/24.04, Debian 12/13, Linux Mint 21/22, Fedora 36/40, openSUSE Tumbleweed, Arch, or RHEL/Rocky/Alma 10 and newer. The Flatpak also runs on older systems such as RHEL 9, and on immutable ones. Packages are not signed with a publisher certificate: Windows SmartScreen may warn, and macOS asks you to choose **Open Anyway** in System Settings › Privacy & Security the first time. See [release verification](docs/RELEASING.md) before running a downloaded build.
 
 ## Use
 

@@ -107,13 +107,13 @@ install_linux() {
         fail "this system uses musl (like Alpine). TikTok Transcriber needs a glibc distribution; try the Flatpak."
     fi
     # x86_64 is built on Ubuntu 22.04, aarch64 on 24.04 (Qt's ARM wheels need it)
-    if [ "$arch" = x86_64 ]; then floor=35; systems="Ubuntu 22.04, Debian 12, Fedora 36, RHEL 9"
+    if [ "$arch" = x86_64 ]; then floor=35; systems="Ubuntu 22.04, Debian 12, Fedora 36, RHEL 10"
     else floor=39; systems="Ubuntu 24.04, Debian 13, Fedora 40"; fi
     glibc=$(ldd --version 2>/dev/null | sed -n '1s/.* \([0-9][0-9]*\.[0-9][0-9]*\)$/\1/p')
     if [ -n "$glibc" ]; then
         major=${glibc%%.*}; minor=${glibc#*.}
         if [ "$major" -lt 2 ] || { [ "$major" -eq 2 ] && [ "$minor" -lt "$floor" ]; }; then
-            say "Warning: glibc $glibc found, TikTok Transcriber for $arch needs 2.$floor or newer ($systems or later)."
+            fail "glibc $glibc found; TikTok Transcriber for $arch needs 2.$floor or newer ($systems or later). On this system, install the Flatpak from $REPO/releases instead."
         fi
     fi
     name="TikTok-Transcriber-$VERSION-linux-$arch.tar.gz"

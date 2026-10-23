@@ -27,6 +27,7 @@ overrides:
       - libxkbcommon0
       - libfontconfig1
       - libdbus-1-3
+      - libwayland-server0
   # by library rather than package name: Fedora, RHEL and openSUSE name the
   # packages differently but all resolve these
   rpm:
@@ -38,6 +39,7 @@ overrides:
       - libxkbcommon.so.0()(64bit)
       - libfontconfig.so.1()(64bit)
       - libdbus-1.so.3()(64bit)
+      - libwayland-server.so.0()(64bit)
   archlinux:
     depends:
       - nss
@@ -46,6 +48,7 @@ overrides:
       - libxkbcommon
       - fontconfig
       - dbus
+      - wayland
 
 contents:
   - src: ./dev/build/dist/tiktok-transcriber
