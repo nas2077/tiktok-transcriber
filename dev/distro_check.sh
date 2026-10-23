@@ -14,15 +14,17 @@ kind=$1
 packages=$(cd "$2" && pwd)
 
 desktop_basics() {
-    # Xvfb plays the screen; Mesa's DRI drivers give it OpenGL, as on a desktop
+    # an X server for the window and Mesa's OpenGL drivers, as any desktop has;
+    # one package at a time, so a name one release lacks does not stop the rest
     if command -v apt-get >/dev/null; then
-        DEBIAN_FRONTEND=noninteractive apt-get install -y xvfb xauth libgl1-mesa-dri
+        for p in xvfb libgl1-mesa-dri; do DEBIAN_FRONTEND=noninteractive apt-get install -y "$p"; done
     elif command -v dnf >/dev/null; then
-        dnf install -y xorg-x11-server-Xvfb xorg-x11-xauth mesa-dri-drivers which
+        for p in xorg-x11-server-Xvfb mesa-dri-drivers; do dnf install -y "$p"; done
+        command -v Xvfb >/dev/null || { dnf install -y epel-release && dnf install -y xorg-x11-server-Xvfb; }
     elif command -v zypper >/dev/null; then
-        zypper --non-interactive install xvfb-run Mesa-dri
+        for p in xorg-x11-server-Xvfb Mesa-dri; do zypper --non-interactive install "$p"; done
     elif command -v pacman >/dev/null; then
-        pacman -S --noconfirm xorg-server-xvfb xorg-xauth mesa
+        for p in xorg-server-xvfb mesa; do pacman -S --noconfirm "$p"; done
     fi
 }
 
@@ -55,13 +57,20 @@ set +e
 desktop_basics
 
 tiktok-transcriber --version || { echo "the installed app does not start"; exit 1; }
-if command -v xvfb-run >/dev/null; then
-    timeout 40 xvfb-run -a tiktok-transcriber
+if command -v Xvfb >/dev/null; then
+    # 24-bit color like a real monitor: xvfb-run's default 8-bit screen has no
+    # OpenGL configuration, and Qt stops on that
+    Xvfb :99 -screen 0 1280x1024x24 -nolisten tcp &
+    server=$!
+    sleep 3
+    DISPLAY=:99 timeout 40 tiktok-transcriber
+    code=$?
+    kill "$server" 2>/dev/null
 else
     echo "no Xvfb on this system: using Qt's offscreen platform"
     QT_QPA_PLATFORM=offscreen timeout 40 tiktok-transcriber
+    code=$?
 fi
-code=$?
 crash="$HOME/.local/share/tiktok-transcriber/crash.log"
 if [ -f "$crash" ]; then cat "$crash"; exit 1; fi
 # timeout's 124 means it was still running when the 40 seconds were up
