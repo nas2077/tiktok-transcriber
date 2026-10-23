@@ -60,7 +60,7 @@ brew install --cask tiktok-transcriber
 
 ```powershell
 # Windows · winget
-winget install nas2077.TikTokTranscriber
+winget install nas2077.TikTokTranscriber   # once Microsoft accepts the submission
 # Windows · Scoop
 scoop bucket add tiktok-transcriber https://github.com/nas2077/tiktok-transcriber
 scoop install tiktok-transcriber
