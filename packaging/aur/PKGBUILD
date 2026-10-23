@@ -1,0 +1,28 @@
+# Maintainer: Nas <https://github.com/nas2077>
+pkgname=tiktok-transcriber-bin
+pkgver=0.2.0
+pkgrel=1
+pkgdesc="Readable transcripts from public TikTok clips and profiles, recognized locally"
+arch=('x86_64' 'aarch64')
+url="https://github.com/nas2077/tiktok-transcriber"
+license=('MIT')
+depends=('nss' 'alsa-lib' 'libglvnd' 'libxkbcommon' 'fontconfig' 'dbus' 'wayland' 'gcc-libs' 'mesa' 'expat' 'zlib')
+provides=('tiktok-transcriber')
+conflicts=('tiktok-transcriber')
+options=('!strip' '!debug')
+source_x86_64=("$pkgname-$pkgver-x86_64.tar.gz::$url/releases/download/v$pkgver/TikTok-Transcriber-$pkgver-linux-x86_64.tar.gz")
+source_aarch64=("$pkgname-$pkgver-aarch64.tar.gz::$url/releases/download/v$pkgver/TikTok-Transcriber-$pkgver-linux-aarch64.tar.gz")
+sha256sums_x86_64=('fd00d842e093eada5df253b80a82da00d57ad15c1e500f6e68f8b2f2d6fe8fce')
+sha256sums_aarch64=('4b771293cf4849d5177a05764387bce9de2ee51a0e5f415705d79e006b79e947')
+
+package() {
+  local id=io.github.nas2077.TikTokTranscriber
+  install -d "$pkgdir/opt/tiktok-transcriber" "$pkgdir/usr/bin"
+  cp -a tiktok-transcriber/. "$pkgdir/opt/tiktok-transcriber/"
+  rm "$pkgdir/opt/tiktok-transcriber/$id.desktop" "$pkgdir/opt/tiktok-transcriber/$id.metainfo.xml" "$pkgdir/opt/tiktok-transcriber/$id.png"
+  ln -s /opt/tiktok-transcriber/tiktok-transcriber "$pkgdir/usr/bin/tiktok-transcriber"
+  install -Dm644 "tiktok-transcriber/$id.desktop" "$pkgdir/usr/share/applications/$id.desktop"
+  install -Dm644 "tiktok-transcriber/$id.metainfo.xml" "$pkgdir/usr/share/metainfo/$id.metainfo.xml"
+  install -Dm644 "tiktok-transcriber/$id.png" "$pkgdir/usr/share/icons/hicolor/512x512/apps/$id.png"
+  install -Dm644 tiktok-transcriber/_internal/licenses/LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
