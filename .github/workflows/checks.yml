@@ -1,7 +1,8 @@
 name: Checks
 on:
   push:
-    branches: [main]
+    # TEMPORARY: cross-platform-packages runs here until it is merged
+    branches: [main, cross-platform-packages]
   pull_request:
   workflow_dispatch:
 permissions:
