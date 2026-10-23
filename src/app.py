@@ -282,9 +282,11 @@ def flash_taskbar():
     if desktop.MAC:
         try:
             from AppKit import NSApplication
+            from PyObjCTools import AppHelper
 
-            # NSInformationalRequest (10): one bounce of the dock icon
-            NSApplication.sharedApplication().requestUserAttention_(10)
+            # NSInformationalRequest (10): one bounce of the dock icon. AppKit
+            # belongs to the main thread, and this runs on the job's
+            AppHelper.callAfter(NSApplication.sharedApplication().requestUserAttention_, 10)
         except Exception:
             pass
         return

@@ -74,7 +74,7 @@ sudo dnf install ./tiktok-transcriber-0.2.0-1.x86_64.rpm
 # openSUSE
 sudo zypper install ./tiktok-transcriber-0.2.0-1.x86_64.rpm
 # Arch Linux, Manjaro, EndeavourOS
-yay -S tiktok-transcriber-bin
+sudo pacman -U ./tiktok-transcriber-0.2.0-1-x86_64.pkg.tar.zst
 # Any distribution · Flatpak (with Flathub set up for its runtime)
 flatpak install --user ./TikTok-Transcriber-0.2.0-linux-x86_64.flatpak
 # Any distribution · AppImage
@@ -83,7 +83,7 @@ chmod +x TikTok-Transcriber-0.2.0-linux-x86_64.AppImage && ./TikTok-Transcriber-
 
 ```bash
 # Any system with Python 3.11 or newer
-pipx install tiktok-transcriber        # or: uv tool install tiktok-transcriber
+pipx install https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/tiktok_transcriber-0.2.0-py3-none-any.whl
 ```
 
 </details>
