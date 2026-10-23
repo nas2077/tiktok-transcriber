@@ -117,7 +117,9 @@ jobs:
             libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 \
             libegl1 libgl1 libnss3 libxcomposite1 libxdamage1 libxrandr2 \
             libxtst6 libxkbfile1 libdbus-1-3 desktop-file-utils appstream xvfb \
-            zlib1g-dev pkg-config libopus0
+            zlib1g-dev pkg-config libopus0 libpulse0
+          # Qt WebEngine also links minizip; renamed libminizip1t64 on 24.04
+          sudo apt-get install -y --no-install-recommends libminizip1t64 || sudo apt-get install -y --no-install-recommends libminizip1
           # renamed libasound2t64 on 24.04
           sudo apt-get install -y --no-install-recommends libasound2t64 || sudo apt-get install -y --no-install-recommends libasound2
       - name: Packaging tools, checksums verified
