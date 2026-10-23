@@ -139,12 +139,12 @@ jobs:
         run: bash dev/build.sh --strict
       - name: Check bundled libraries
         run: |
-          # optional parts (CUDA providers, other Qt platform plugins) may name
+          # optional parts (CUDA providers, Qt's Wayland compositor) may name
           # libraries a desktop does not have; the window, Qt and media must not
           cd dev/build/dist/Syllark/_internal
           missing=$(find . -name '*.so*' -type f -exec sh -c 'LD_LIBRARY_PATH=$PWD ldd "$1" 2>/dev/null | grep "not found" | sed "s|^|$1: |"' _ {} \; | sort -u)
           [ -z "$missing" ] || { echo "Unresolved (informational):"; echo "$missing"; }
-          if echo "$missing" | grep -E 'libQt6(Core|Gui|Widgets|WebEngine|WebChannel|Network)|libqxcb|libqwayland|/av/|libav|libsw'; then
+          if echo "$missing" | grep -v Compositor | grep -E 'libQt6(Core|Gui|Widgets|WebEngine|WebChannel|Network)|libqxcb|libqwayland|/av/|libav|libsw'; then
             echo "A required library is not bundled"; exit 1
           fi
           echo "Window, Qt and media libraries resolve."

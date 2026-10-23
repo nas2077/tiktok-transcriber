@@ -48,31 +48,6 @@ jobs:
           python dev/natural_contract_check.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python dev/model_matrix_check.py
-      # TEMPORARY comparison: the same WebView2 checks on this branch and on main
-      - name: Interface checks in WebView2 (this branch)
-        if: runner.os == 'Windows'
-        continue-on-error: true
-        run: |
-          $failed = 0
-          foreach ($check in 'ui_check', 'controls_check', 'design_check', 'navigation_check', 'localization_check') {
-            Write-Host "== $check"
-            python "dev/$check.py" | Select-String -Pattern 'FAIL|passed|^OK|Error' | ForEach-Object { $_.Line }
-            if ($LASTEXITCODE -ne 0) { Write-Host "RESULT $check failed"; $failed++ } else { Write-Host "RESULT $check passed" }
-          }
-          exit $failed
-      - name: Interface checks in WebView2 (main, for comparison)
-        if: runner.os == 'Windows'
-        continue-on-error: true
-        run: |
-          git fetch --depth 1 origin main
-          git worktree add ../main-copy FETCH_HEAD
-          $failed = 0
-          foreach ($check in 'ui_check', 'controls_check', 'design_check', 'navigation_check', 'localization_check') {
-            Write-Host "== main $check"
-            python "../main-copy/dev/$check.py" | Select-String -Pattern 'FAIL|passed|^OK|Error' | ForEach-Object { $_.Line }
-            if ($LASTEXITCODE -ne 0) { Write-Host "RESULT main $check failed"; $failed++ } else { Write-Host "RESULT main $check passed" }
-          }
-          exit $failed
       - name: Audit Python dependencies
         if: runner.os == 'Windows'
         run: |
