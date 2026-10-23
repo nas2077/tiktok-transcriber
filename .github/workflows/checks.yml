@@ -48,6 +48,14 @@ jobs:
           python dev/natural_contract_check.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python dev/model_matrix_check.py
+      - name: Interface checks in WebView2
+        if: runner.os == 'Windows'
+        run: |
+          foreach ($check in 'ui_check', 'controls_check', 'design_check', 'navigation_check', 'localization_check') {
+            Write-Host "== $check"
+            python "dev/$check.py"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
       - name: Audit Python dependencies
         if: runner.os == 'Windows'
         run: |
