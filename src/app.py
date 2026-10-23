@@ -537,6 +537,9 @@ class Api:
         self.workshop = Workshop()
         self.exploration = None
         self.stop_exploration = threading.Event()
+        # each exploration is numbered: the window drops batches that a
+        # stopped one still had on their way, instead of mixing two profiles
+        self._explorations = 0
         self._settings_lock = threading.Lock()
         self._settings = None          # settings kept in memory
 
@@ -783,6 +786,8 @@ class Api:
         # closing, "stopped" has to tell the truth about this one
         halt = threading.Event()
         self.stop_exploration = halt
+        self._explorations += 1
+        run = self._explorations
         bridge.start()
 
         def work():
@@ -796,7 +801,7 @@ class Api:
                     state["folder"] = folder
                     state["done"] = core.transcripts_on_disk(folder)
                     state["downloaded"] = self._downloaded_videos(os.path.join(folder, "video"))
-                    bridge.send({"type": "gal_start", "handle": d["handle"], "folder": folder})
+                    bridge.send({"type": "gal_start", "run": run, "handle": d["handle"], "folder": folder})
 
                 def batch(group, total):
                     for v in group:
@@ -804,7 +809,7 @@ class Api:
                         v["file"] = state["done"].get(v["id"])
                         v["downloaded"] = v["id"] in state["downloaded"]
                         v["video_file"] = state["downloaded"].get(v["id"])
-                    bridge.send({"type": "gal_batch", "videos": group, "total": total})
+                    bridge.send({"type": "gal_batch", "run": run, "videos": group, "total": total})
 
                 r = core.explore_stream(
                     url, browser, limit=int(limit) if limit else None,
@@ -812,16 +817,16 @@ class Api:
                     stopped=halt.is_set,
                     video_link=video_link,
                 )
-                bridge.send({"type": "gal_done", "total": r["total"],
+                bridge.send({"type": "gal_done", "run": run, "total": r["total"],
                              "stopped": halt.is_set()})
             except core.TikTokError as e:
-                bridge.send({"type": "gal_error", "error": str(e)})
+                bridge.send({"type": "gal_error", "run": run, "error": str(e)})
             except Exception as e:
-                bridge.send({"type": "gal_error", "error": core._explain_error(str(e))})
+                bridge.send({"type": "gal_error", "run": run, "error": core._explain_error(str(e))})
 
         self.exploration = threading.Thread(target=work, daemon=True)
         self.exploration.start()
-        return {"ok": True}
+        return {"ok": True, "run": run}
 
     def stop_explore(self):
         self.stop_exploration.set()

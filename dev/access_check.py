@@ -140,6 +140,12 @@ class AnonymousTests(unittest.TestCase):
 
     def test_canonical_page_wins_over_signed_cdn_url(self):
         self.assertEqual(core._entry({"id": "7300000000000000001", "url": "https://cdn.example/video.mp4", "webpage_url": URL}, "sample")["url"], URL)
+        # a signed file on a tiktok.com host alone still becomes the page link
+        cdn = "https://v16-webapp.tiktok.com/abc/video.mp4?sig=1"
+        self.assertEqual(core._entry({"id": "7300000000000000001", "url": cdn}, "sample")["url"],
+                         "https://www.tiktok.com/@sample/video/7300000000000000001")
+        photo = "https://www.tiktok.com/@sample/photo/7300000000000000002"
+        self.assertEqual(core._entry({"id": "7300000000000000002", "url": photo}, "other")["url"], photo)
 
     def test_settings_migrate_away_from_browser_choice(self):
         with tempfile.TemporaryDirectory() as folder, patch.object(app, "SETTINGS_FILE", str(Path(folder) / "settings.json")):

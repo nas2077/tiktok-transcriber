@@ -419,6 +419,12 @@ def normalize_profile(text, _resolve=True):
     raise TikTokError(f"'{t[:60]}' does not look like a tiktok profile")
 
 
+def _post_link(text):
+    """a TikTok page for one video or photo post, not a signed CDN file"""
+    url = _tiktok_url(str(text or ""))
+    return bool(url and re.fullmatch(r"/@[\w.\-]+/(video|photo)/\d+/?", urlsplit(url).path))
+
+
 def is_video_link(text):
     url = _tiktok_url(text)
     return bool(url and re.fullmatch(r"/@[\w.\-]+/video/\d+/?", urlsplit(url).path))
@@ -510,7 +516,7 @@ def _entry(v, author):
     # Full video extraction also has a signed CDN 'url'; keep the canonical
     # webpage link so downloads can refresh it and 'Open on TikTok' stays correct.
     u = v.get("webpage_url") or v.get("url")
-    if not u or not str(u).startswith("http") or is_video_link(u):
+    if not _post_link(u):
         u = f"https://www.tiktok.com/@{author}/video/{v.get('id')}"
     return {
         "id": str(v.get("id")),
@@ -1999,7 +2005,8 @@ class Transcriber:
                         if spare:
                             forget(spare[1])
                             if not self.stop.is_set():
-                                self._errors += 1
+                                with self._lock:
+                                    self._errors += 1
                                 self._video_state(spare[0]["id"], "error",
                                                   message="The transcription worker stopped unexpectedly.")
                     except queue.Empty:

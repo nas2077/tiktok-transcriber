@@ -223,9 +223,9 @@ def system_dark_theme():
         except Exception:
             return True
     if MAC:
-        # the key only exists in dark mode
+        # the key only exists in dark mode: reading it fails in light mode
         value = _read(["defaults", "read", "-g", "AppleInterfaceStyle"])
-        return value is None or "dark" in value.lower()
+        return value is not None and "dark" in value.lower()
     value = _read(["gsettings", "get", "org.gnome.desktop.interface", "color-scheme"])
     if value and "default" not in value:
         return "dark" in value
@@ -263,7 +263,8 @@ def user_locale():
                     return part
     for name in ("LC_ALL", "LC_MESSAGES", "LANGUAGE", "LANG"):
         value = os.environ.get(name, "")
-        value = value.split(":")[0].split(".")[0]
+        # "it_IT.UTF-8@euro" -> "it-IT"
+        value = value.split(":")[0].split(".")[0].split("@")[0]
         if value and value not in ("C", "POSIX"):
             return value.replace("_", "-")
     return ""
