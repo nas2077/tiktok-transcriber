@@ -1,6 +1,6 @@
 """Write the package-manager manifests for a release from its SHA256SUMS.txt.
 
-    python dev/update_manifests.py 0.2.0 SHA256SUMS.txt
+    python dev/update_manifests.py 0.2.1 SHA256SUMS.txt
 
 Writes, all pointing at https://github.com/nas2077/tiktok-transcriber/releases/tag/v<version>:
 

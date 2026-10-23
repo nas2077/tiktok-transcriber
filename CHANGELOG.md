@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1 — 2026-10-23
+
+Security update.
+
+- Brotli 1.2.1 fixes CVE-2026-111497 (PYSEC-2026-4322), an out-of-bounds write in
+  the Brotli decoder that a crafted compressed network response could reach.
+  Every 0.2.0 package carried Brotli 1.2.0; please update.
+
 ## 0.2.0 — 2026-10-23
 
 Syllark is now **TikTok Transcriber**, on macOS and Linux too, with more ways to

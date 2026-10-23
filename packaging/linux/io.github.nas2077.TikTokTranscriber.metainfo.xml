@@ -37,6 +37,11 @@
     <display_length compare="ge">1000</display_length>
   </requires>
   <releases>
+    <release version="0.2.1" date="2026-10-23">
+      <description>
+        <p>Security update: Brotli 1.2.1 fixes an out-of-bounds write in its decoder (CVE-2026-111497).</p>
+      </description>
+    </release>
     <release version="0.2.0" date="2026-10-23">
       <description>
         <p>macOS and Linux builds, installers and package-manager installs.</p>

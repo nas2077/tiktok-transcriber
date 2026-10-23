@@ -7,7 +7,7 @@
 # Linux: the app goes to ~/.local/share/tiktok-transcriber, the `tiktok-transcriber` command to
 # ~/.local/bin and a menu entry to ~/.local/share/applications.
 #
-# Environment: TIKTOK_TRANSCRIBER_VERSION=0.2.0 installs that version instead of the
+# Environment: TIKTOK_TRANSCRIBER_VERSION=0.2.1 installs that version instead of the
 # latest; TIKTOK_TRANSCRIBER_UNINSTALL=1 removes TikTok Transcriber (settings and models stay).
 # TIKTOK_TRANSCRIBER_MIRROR=<url> downloads the release files from there instead of
 # GitHub (the release workflow tests this script against a local server).

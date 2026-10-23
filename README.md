@@ -26,10 +26,10 @@ TikTok Transcriber turns public TikTok videos and profiles into readable transcr
 
 | System | Packages |
 |---|---|
-| **Windows** 10/11 · x64 | [Installer](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-windows-x64-setup.exe) · [Portable ZIP](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-windows-x64.zip) |
-| **macOS** 11+ | [Apple silicon](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-macos-arm64.dmg) · [Intel](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-macos-x64.dmg) |
-| **Linux** · x86_64 | [AppImage](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-linux-x86_64.AppImage) · [.deb](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/tiktok-transcriber_0.2.0-1_amd64.deb) · [.rpm](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/tiktok-transcriber-0.2.0-1.x86_64.rpm) · [Arch](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/tiktok-transcriber-0.2.0-1-x86_64.pkg.tar.zst) · [Flatpak](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-linux-x86_64.flatpak) · [.tar.gz](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-linux-x86_64.tar.gz) |
-| **Linux** · ARM64 | [AppImage](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-linux-aarch64.AppImage) · [.deb](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/tiktok-transcriber_0.2.0-1_arm64.deb) · [.rpm](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/tiktok-transcriber-0.2.0-1.aarch64.rpm) · [Arch](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/tiktok-transcriber-0.2.0-1-aarch64.pkg.tar.zst) · [.tar.gz](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-linux-aarch64.tar.gz) |
+| **Windows** 10/11 · x64 | [Installer](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/TikTok-Transcriber-0.2.1-windows-x64-setup.exe) · [Portable ZIP](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/TikTok-Transcriber-0.2.1-windows-x64.zip) |
+| **macOS** 11+ | [Apple silicon](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/TikTok-Transcriber-0.2.1-macos-arm64.dmg) · [Intel](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/TikTok-Transcriber-0.2.1-macos-x64.dmg) |
+| **Linux** · x86_64 | [AppImage](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/TikTok-Transcriber-0.2.1-linux-x86_64.AppImage) · [.deb](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/tiktok-transcriber_0.2.1-1_amd64.deb) · [.rpm](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/tiktok-transcriber-0.2.1-1.x86_64.rpm) · [Arch](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/tiktok-transcriber-0.2.1-1-x86_64.pkg.tar.zst) · [Flatpak](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/TikTok-Transcriber-0.2.1-linux-x86_64.flatpak) · [.tar.gz](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/TikTok-Transcriber-0.2.1-linux-x86_64.tar.gz) |
+| **Linux** · ARM64 | [AppImage](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/TikTok-Transcriber-0.2.1-linux-aarch64.AppImage) · [.deb](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/tiktok-transcriber_0.2.1-1_arm64.deb) · [.rpm](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/tiktok-transcriber-0.2.1-1.aarch64.rpm) · [Arch](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/tiktok-transcriber-0.2.1-1-aarch64.pkg.tar.zst) · [.tar.gz](https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/TikTok-Transcriber-0.2.1-linux-aarch64.tar.gz) |
 
 Every package carries its own Python and speech engines. [Releases](https://github.com/nas2077/tiktok-transcriber/releases) list checksums and release notes.
 
@@ -68,22 +68,22 @@ scoop install tiktok-transcriber
 
 ```bash
 # Debian, Ubuntu, Linux Mint, Pop!_OS, elementary OS, Zorin OS, Kali
-sudo apt install ./tiktok-transcriber_0.2.0-1_amd64.deb
+sudo apt install ./tiktok-transcriber_0.2.1-1_amd64.deb
 # Fedora, and RHEL, Rocky Linux or AlmaLinux 10
-sudo dnf install ./tiktok-transcriber-0.2.0-1.x86_64.rpm
+sudo dnf install ./tiktok-transcriber-0.2.1-1.x86_64.rpm
 # openSUSE
-sudo zypper install ./tiktok-transcriber-0.2.0-1.x86_64.rpm
+sudo zypper install ./tiktok-transcriber-0.2.1-1.x86_64.rpm
 # Arch Linux, Manjaro, EndeavourOS
-sudo pacman -U ./tiktok-transcriber-0.2.0-1-x86_64.pkg.tar.zst
+sudo pacman -U ./tiktok-transcriber-0.2.1-1-x86_64.pkg.tar.zst
 # Any distribution · Flatpak (with Flathub set up for its runtime)
-flatpak install --user ./TikTok-Transcriber-0.2.0-linux-x86_64.flatpak
+flatpak install --user ./TikTok-Transcriber-0.2.1-linux-x86_64.flatpak
 # Any distribution · AppImage
-chmod +x TikTok-Transcriber-0.2.0-linux-x86_64.AppImage && ./TikTok-Transcriber-0.2.0-linux-x86_64.AppImage
+chmod +x TikTok-Transcriber-0.2.1-linux-x86_64.AppImage && ./TikTok-Transcriber-0.2.1-linux-x86_64.AppImage
 ```
 
 ```bash
 # Any system with Python 3.11 or newer
-pipx install https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/tiktok_transcriber-0.2.0-py3-none-any.whl
+pipx install https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/tiktok_transcriber-0.2.1-py3-none-any.whl
 ```
 
 </details>

@@ -31,7 +31,7 @@ macOS asks the first time: open System Settings > Privacy & Security and choose
 Download the package and `SHA256SUMS.txt` from the same release, then compare:
 
 ```powershell
-Get-FileHash .\TikTok-Transcriber-0.2.0-windows-x64-setup.exe -Algorithm SHA256
+Get-FileHash .\TikTok-Transcriber-0.2.1-windows-x64-setup.exe -Algorithm SHA256
 ```
 
 ```bash
