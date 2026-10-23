@@ -71,6 +71,27 @@ start_window() {
     [ "$code" = 124 ] || { echo "TikTok Transcriber exited early with code $code"; return 1; }
 }
 
+# when the window does not open: does the system's own OpenGL work on this
+# screen, and which graphics libraries does the bundle carry
+diagnose_gl() {
+    echo "::group::OpenGL diagnosis"
+    if command -v apt-get >/dev/null; then DEBIAN_FRONTEND=noninteractive apt-get install -y mesa-utils >/dev/null 2>&1
+    elif command -v dnf >/dev/null; then dnf install -y glx-utils >/dev/null 2>&1
+    elif command -v zypper >/dev/null; then zypper --non-interactive install Mesa-demo-x >/dev/null 2>&1
+    elif command -v pacman >/dev/null; then pacman -S --noconfirm mesa-utils >/dev/null 2>&1; fi
+    if command -v glxinfo >/dev/null; then
+        DISPLAY=:99 glxinfo -B 2>&1 | head -20
+    else
+        echo "no glxinfo on this system"
+    fi
+    program=$(readlink -f "$(command -v tiktok-transcriber)")
+    folder=$(dirname "$program")
+    echo "bundle: $folder"
+    find "$folder" -name '*.so*' | grep -i -E 'libgl|libegl|glapi|libdrm|libgbm|libxcb-glx|libx11|libstdc|libgcc|libexpat|libz\.so' | sort
+    DISPLAY=:99 LIBGL_DEBUG=verbose timeout 15 tiktok-transcriber 2>&1 | grep -i -E 'libgl|dri|glx|egl|mesa' | head -30
+    echo "::endgroup::"
+}
+
 if command -v Xvfb >/dev/null; then
     # 24-bit color like a real monitor: xvfb-run's default 8-bit screen has no
     # OpenGL configuration, and Qt stops on that
@@ -89,6 +110,7 @@ if command -v Xvfb >/dev/null; then
         fi
         echo "::endgroup::"
         echo "Default start failed; with QT_XCB_GL_INTEGRATION=xcb_egl it $egl."
+        diagnose_gl
     fi
     kill "$server" 2>/dev/null
 else
