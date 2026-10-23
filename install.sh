@@ -155,7 +155,9 @@ main() {
     VERSION=${VERSION#v}
     BASE=${TIKTOK_TRANSCRIBER_MIRROR:-$REPO/releases/download/v$VERSION}
     TMP=$(mktemp -d)
-    trap 'hdiutil detach -quiet "$TMP/mount" 2>/dev/null; rm -rf "$TMP"' EXIT INT TERM
+    # with set -e a failing command in the trap would become the exit code:
+    # hdiutil only exists on macOS, and the disk image may already be detached
+    trap 'hdiutil detach -quiet "$TMP/mount" 2>/dev/null || true; rm -rf "$TMP"' EXIT INT TERM
     say "Installing TikTok Transcriber $VERSION"
     fetch "$BASE/SHA256SUMS.txt" "$TMP/SHA256SUMS.txt"
     case "$system" in

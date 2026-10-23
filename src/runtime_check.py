@@ -1,7 +1,9 @@
 """Explicit release verification command; never runs on ordinary app startup."""
+import faulthandler
 import hashlib
 import json
 import os
+import sys
 import tempfile
 import time
 
@@ -9,8 +11,10 @@ import tiktok_core as core
 
 
 def run(audio, report_path, model=core.DEFAULT_MODEL, language="auto"):
+    # a verification that hangs says where, instead of waiting forever
+    faulthandler.dump_traceback_later(900, exit=True)
     begin = time.perf_counter()
-    engine = core.Engine(model, log=lambda *a: None)
+    engine = core.Engine(model, log=lambda text, *a: print(text, file=sys.stderr, flush=True))
     lines, meta = engine.transcribe(audio, language)
     report = {"passed": False, "model": engine.name, "device": engine.device,
               "compute": engine.compute, "lines": lines, "meta": meta,

@@ -2,6 +2,7 @@
 
 import gc
 import json
+import multiprocessing
 import os
 import queue
 import re
@@ -9,6 +10,13 @@ import sys
 import threading
 import time
 import traceback
+
+# libraries start helper processes (multiprocessing's resource tracker, for
+# one) by running sys.executable again. in the built program that is the app
+# itself: without this, the helper opened a whole second app and macOS hung.
+# it returns at once in the real app and turns the helper into the helper.
+if getattr(sys, "frozen", False):
+    multiprocessing.freeze_support()
 
 # where ui.html, vendor/ and the icon are: next to this file, or inside the
 # .exe's runtime folder when it runs as the built program

@@ -42,11 +42,14 @@ def main():
     with tempfile.TemporaryDirectory(prefix="speech_smoke_") as folder:
         wav = synthesize(folder)
         report_path = os.path.join(folder, "report.json")
-        result = subprocess.run([executable, "--verify-runtime", wav, report_path, model, "en"],
-                                capture_output=True, text=True, timeout=1800)
-        print(result.stdout[-4000:], result.stderr[-4000:], sep="\n")
+        # output goes straight to the log, so a hang shows where it stopped
+        try:
+            code = subprocess.run([executable, "--verify-runtime", wav, report_path, model, "en"],
+                                  timeout=1200).returncode
+        except subprocess.TimeoutExpired:
+            raise SystemExit("the app did not finish within 20 minutes")
         if not os.path.exists(report_path):
-            raise SystemExit(f"no report (exit code {result.returncode})")
+            raise SystemExit(f"no report (exit code {code})")
         with open(report_path, encoding="utf-8") as f:
             report = json.load(f)
     text = report.get("text", "")
