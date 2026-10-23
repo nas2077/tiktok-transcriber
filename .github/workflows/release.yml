@@ -68,8 +68,6 @@ jobs:
         run: command -v pkg-config || brew install pkgconf
       - name: Build app and disk image
         run: bash dev/build.sh --strict
-      - name: Media library license
-        run: dev/.venv/bin/python -c "import av._core as c; m=c.library_meta['libavcodec']; print(m['license']); print(m['configuration'])"
       - name: Start the built app
         run: |
           dev/build/dist/Syllark.app/Contents/MacOS/Syllark --version
@@ -137,8 +135,6 @@ jobs:
           appstreamcli validate --no-net --explain packaging/linux/io.github.nas2077.Syllark.metainfo.xml
       - name: Build bundle and packages
         run: bash dev/build.sh --strict
-      - name: Media library license
-        run: dev/.venv/bin/python -c "import av._core as c; m=c.library_meta['libavcodec']; print(m['license']); print(m['configuration'])"
       - name: Start the built app
         run: |
           dev/build/dist/Syllark/Syllark --version

@@ -3,9 +3,6 @@
 *.bat  text eol=crlf
 *.ps1  text eol=crlf
 
-# license texts are checked against upstream SHA-256 values: keep their bytes
-src/licenses/** -text
-
 # shell scripts run on macOS and Linux: LF even in a windows checkout
 *.sh   text eol=lf
 PKGBUILD text eol=lf
@@ -14,3 +11,7 @@ PKGBUILD text eol=lf
 *      text=auto
 *.ico  binary
 *.png  binary
+
+# license texts are checked against upstream SHA-256 values: keep their bytes.
+# last, so the text=auto above does not override it
+src/licenses/** -text

@@ -1,8 +1,24 @@
-# Windows media libraries
+# Media libraries
 
-The application reads audio through PyAV. Its Windows wheel includes FFmpeg
-libraries with additional codec-license considerations. Syllark's public build
-uses a pinned LGPL-only shared FFmpeg variant without x264/x265.
+The application reads audio through PyAV. PyPI's PyAV wheels include FFmpeg
+libraries with additional codec-license considerations: the macOS and Linux
+wheels, for example, are configured with x264 and x265, which are GPL. Every
+Syllark package therefore uses LGPL-only FFmpeg libraries without x264/x265.
+
+## macOS and Linux
+
+`dev/build_media.sh` (run by `dev/build.sh`) downloads the same pinned FFmpeg
+revision used for Windows, `46d899d7a02bc63237472cc4897258d5ddf274ac`, verifies
+its SHA-256 (the archive listed in [media-sources.json](media-sources.json)), and
+compiles it with `--enable-version3 --disable-autodetect`, threads and zlib, and
+no external codec library. PyAV 18.1.0 is then compiled from its PyPI source
+against those libraries. The script refuses a result whose configuration
+contains `--enable-gpl`, `--enable-nonfree`, x264 or x265. FFmpeg's own decoders
+cover the AAC, MP3, Opus, Vorbis and FLAC audio Syllark reads.
+
+The Linux window uses Qt through PySide6, which is LGPL; PyQt is not bundled.
+
+## Windows
 
 ## Inputs and modification
 
