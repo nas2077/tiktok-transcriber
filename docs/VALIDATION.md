@@ -40,11 +40,22 @@ the bundled Qt, its platform plugins and the media libraries resolve, that PyAV
 reports LGPL-only FFmpeg without x264/x265, and that the Python wheel installs
 and runs `tiktok-transcriber --version`.
 
-Not yet verified on macOS or Linux: real speech recognition and exports in the
-built apps, model downloads, Metal and Vulkan acceleration, CUDA on Linux, the
-Flatpak on a desktop, Wayland sessions, and installation by the terminal scripts
-and package managers on clean machines. The offline check "an eta shows up" is
-timing-sensitive with mocked instant recognition and failed once on macOS CI.
+The release workflow also makes the operating system's voice say a sentence and
+transcribes it with each built app (Whisper small everywhere, Natural on macOS
+arm64 and Linux x86_64), installs and uninstalls the Windows installer and
+`install.sh` on macOS and Linux, and installs each Linux package with the
+distribution's own package manager in 14 clean containers: Ubuntu 22.04 and
+24.04, Debian 12 and 13, Linux Mint 22, Fedora 42, AlmaLinux 10, openSUSE
+Tumbleweed and Arch on x86_64, the AppImage on Fedora 42 and Debian 12, and
+Ubuntu 24.04, Debian 13 and Fedora 42 on ARM64. Each must print its version and
+keep its window open for 40 seconds on a 24-bit Xvfb screen with Mesa's
+software OpenGL (AlmaLinux 10 has no Xvfb and uses Qt's offscreen platform).
+
+Not yet verified on macOS or Linux: model downloads by hand, Metal and Vulkan
+acceleration on real hardware, CUDA on Linux, the Flatpak on a desktop, Wayland
+sessions, and the Homebrew, Scoop and winget installs on clean machines. The
+offline check "an eta shows up" is timing-sensitive with mocked instant
+recognition and failed once on macOS CI.
 
 ## Real audio and public network coverage
 

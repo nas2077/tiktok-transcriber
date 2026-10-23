@@ -3,13 +3,12 @@
 #
 #   sh dev/distro_check.sh <deb|rpm|arch|appimage> <folder with the packages>
 #
-# Runs as root inside a distribution container (the release workflow and
-# .github/workflows/distro-check.yml). It installs the package with the
-# system's own package manager, adds what any desktop already has (an X11
-# screen and Mesa's OpenGL drivers), then requires the app to print its
-# version and to stay open for 40 seconds without a crash log. When the
-# default start fails, it also tries Qt's EGL integration on X11 and reports
-# that result, so a GLX-only failure can be told apart from a broken package.
+# Runs as root inside a distribution container (the release workflow). It
+# installs the package with the system's own package manager, adds what any
+# desktop already has (an X11 screen and Mesa's OpenGL drivers), then requires
+# the app to print its version and to stay open for 40 seconds without a crash
+# log. When the window does not open, it says whether the system's own OpenGL
+# works on that screen and which graphics libraries the bundle carries.
 set -u
 kind=$1
 # absolute: apt reads "pkg/x.deb" as a package name to download
@@ -72,8 +71,9 @@ start_window() {
     [ "$code" = 124 ] || { echo "TikTok Transcriber exited early with code $code"; return 1; }
 }
 
-# when the window does not open: does the system's own OpenGL work on this
-# screen, and which graphics libraries does the bundle carry
+# a bundled copy of a library Mesa uses (libstdc++ from the build machine,
+# once) stops the system's driver from loading: Qt then aborts with "Could not
+# initialize GLX" while glxinfo works on the same screen
 diagnose_gl() {
     echo "::group::OpenGL diagnosis"
     if command -v apt-get >/dev/null; then DEBIAN_FRONTEND=noninteractive apt-get install -y mesa-utils >/dev/null 2>&1
@@ -103,14 +103,6 @@ if command -v Xvfb >/dev/null; then
         result=0
     else
         result=1
-        echo "::group::retry with QT_XCB_GL_INTEGRATION=xcb_egl"
-        if start_window DISPLAY=:99 QT_XCB_GL_INTEGRATION=xcb_egl; then
-            egl=passed
-        else
-            egl=failed
-        fi
-        echo "::endgroup::"
-        echo "Default start failed; with QT_XCB_GL_INTEGRATION=xcb_egl it $egl."
         diagnose_gl
     fi
     kill "$server" 2>/dev/null
