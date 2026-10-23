@@ -112,14 +112,17 @@ def winget(ver, sums):
     setup = f"TikTok-Transcriber-{ver}-windows-x64-setup.exe"
     digest = need(sums, setup).upper()
     base = f"packaging/winget/{ver}/nas2077.TikTokTranscriber"
-    header = "# Created with dev/update_manifests.py\n"
-    write(f"{base}.yaml", header + f"""PackageIdentifier: nas2077.TikTokTranscriber
+    def header(kind):
+        return ("# Created with dev/update_manifests.py\n"
+                f"# yaml-language-server: $schema=https://aka.ms/winget-manifest.{kind}.1.12.0.schema.json\n\n")
+
+    write(f"{base}.yaml", header("version") + f"""PackageIdentifier: nas2077.TikTokTranscriber
 PackageVersion: {ver}
 DefaultLocale: en-US
 ManifestType: version
-ManifestVersion: 1.6.0
+ManifestVersion: 1.12.0
 """)
-    write(f"{base}.installer.yaml", header + f"""PackageIdentifier: nas2077.TikTokTranscriber
+    write(f"{base}.installer.yaml", header("installer") + f"""PackageIdentifier: nas2077.TikTokTranscriber
 PackageVersion: {ver}
 InstallerType: inno
 Scope: user
@@ -134,9 +137,9 @@ Installers:
     InstallerUrl: {REPO}/releases/download/v{ver}/{setup}
     InstallerSha256: {digest}
 ManifestType: installer
-ManifestVersion: 1.6.0
+ManifestVersion: 1.12.0
 """)
-    write(f"{base}.locale.en-US.yaml", header + f"""PackageIdentifier: nas2077.TikTokTranscriber
+    write(f"{base}.locale.en-US.yaml", header("defaultLocale") + f"""PackageIdentifier: nas2077.TikTokTranscriber
 PackageVersion: {ver}
 PackageLocale: en-US
 Publisher: Nas
@@ -154,7 +157,7 @@ Tags:
   - tiktok
 ReleaseNotesUrl: {REPO}/releases/tag/v{ver}
 ManifestType: defaultLocale
-ManifestVersion: 1.6.0
+ManifestVersion: 1.12.0
 """)
 
 
