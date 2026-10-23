@@ -1,3 +1,5 @@
 pyinstaller==6.22.3
 pefile==2024.8.26
 packaging==26.3
+# PyInstaller turns the PNG icon into the macOS .icns with it
+pillow>=11; sys_platform == "darwin"

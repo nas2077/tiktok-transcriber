@@ -1,0 +1,35 @@
+# Flatpak of the Linux bundle. The release workflow puts the bundle archive
+# next to this file as syllark-bundle.tar.gz before running flatpak-builder.
+id: io.github.nas2077.Syllark
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+command: syllark
+finish-args:
+  - --share=network
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  # the output folder can be anywhere the user picks, Documents by default
+  - --filesystem=home
+modules:
+  - name: syllark
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/lib/syllark /app/bin
+      - cp -a bundle/. /app/lib/syllark/
+      - ln -s /app/lib/syllark/Syllark /app/bin/syllark
+      - install -Dm644 io.github.nas2077.Syllark.desktop /app/share/applications/io.github.nas2077.Syllark.desktop
+      - install -Dm644 io.github.nas2077.Syllark.metainfo.xml /app/share/metainfo/io.github.nas2077.Syllark.metainfo.xml
+      - install -Dm644 icon.png /app/share/icons/hicolor/512x512/apps/io.github.nas2077.Syllark.png
+    sources:
+      - type: archive
+        path: syllark-bundle.tar.gz
+        dest: bundle
+      - type: file
+        path: ../io.github.nas2077.Syllark.desktop
+      - type: file
+        path: ../io.github.nas2077.Syllark.metainfo.xml
+      - type: file
+        path: ../../../src/icon.png

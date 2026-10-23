@@ -198,6 +198,7 @@
   "no such profile, check how you spelled it": "profil bulunamadı: adı doğru yazdığınızı kontrol edin",
   "no usable graphics card: whisper on a cpu is slow, turbo helps a lot": "uygun ekran kartı yok: Whisper CPU'da daha yavaş çalışır; Turbo çok yardımcı olur",
   "no windows build of {p0} on pypi": "PyPI'da {p0} için Windows sürümü yok",
+  "no linux build of {p0} on pypi": "PyPI'da {p0} için Linux sürümü yok",
   "not downloaded": "indirilmedi",
   "not installed": "kurulu değil",
   "nvidia card found: fetching its libraries (about 1.2 gb, only the first time)": "NVIDIA ekran kartı bulundu: kitaplıkları indiriliyor (yaklaşık 1,2 GB, yalnızca ilk seferde)",

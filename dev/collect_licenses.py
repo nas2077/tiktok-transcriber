@@ -17,7 +17,10 @@ def application_distributions():
     pending = []
     for line in (ROOT/'dev/requirements.txt').read_text(encoding='utf-8').splitlines():
         if line.strip() and not line.lstrip().startswith('#'):
-            pending.append(Requirement(line))
+            requirement = Requirement(line)
+            # Only what this system installs: the window library differs per system.
+            if requirement.marker is None or requirement.marker.evaluate({'extra': ''}):
+                pending.append(requirement)
     found = {}
     extras_seen = {}
     while pending:
@@ -86,7 +89,8 @@ def main():
     python_license = Path(sys.base_prefix)/'LICENSE.txt'
     if python_license.exists():
         shutil.copy2(python_license,ROOT/'src/licenses/Python-LICENSE.txt')
-    rows = ['# Python dependencies', '', 'Installed application dependency closure on Windows x64. Native bundled libraries',
+    system = {'win32': 'Windows x64', 'darwin': 'macOS'}.get(sys.platform, 'Linux')
+    rows = ['# Python dependencies', '', f'Installed application dependency closure on {system}. Native bundled libraries',
             'and downloaded model terms are described in the third-party notices.', '',
             '| Package | Tested version | License |', '|---|---|---|']
     for item in inventory:

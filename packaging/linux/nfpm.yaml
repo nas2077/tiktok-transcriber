@@ -1,0 +1,62 @@
+# .deb, .rpm and Arch packages of the Linux bundle. Run by dev/make_packages.py
+# from the repository root with SYLLARK_VERSION and SYLLARK_ARCH (amd64/arm64).
+name: syllark
+arch: ${SYLLARK_ARCH}
+platform: linux
+version: ${SYLLARK_VERSION}
+release: 1
+section: sound
+priority: optional
+maintainer: Nas <noreply@github.com>
+vendor: Nas
+homepage: https://github.com/nas2077/syllark
+license: MIT
+description: |-
+  Readable transcripts from public TikTok clips and profiles.
+  Recognition runs locally with integrated Qwen and Whisper models.
+
+# The bundle carries Python, Qt and the speech engines. These are the system
+# libraries Qt WebEngine still expects from the distribution.
+overrides:
+  deb:
+    depends:
+      - libnss3
+      - libasound2t64 | libasound2
+      - libgl1
+      - libegl1
+      - libxkbcommon0
+      - libfontconfig1
+      - libdbus-1-3
+  rpm:
+    depends:
+      - nss
+      - alsa-lib
+      - libglvnd-glx
+      - libglvnd-egl
+      - libxkbcommon
+      - fontconfig
+      - dbus-libs
+  archlinux:
+    depends:
+      - nss
+      - alsa-lib
+      - libglvnd
+      - libxkbcommon
+      - fontconfig
+      - dbus
+
+contents:
+  - src: ./dev/build/dist/Syllark
+    dst: /opt/syllark
+    type: tree
+  - src: /opt/syllark/Syllark
+    dst: /usr/bin/syllark
+    type: symlink
+  - src: ./packaging/linux/io.github.nas2077.Syllark.desktop
+    dst: /usr/share/applications/io.github.nas2077.Syllark.desktop
+  - src: ./packaging/linux/io.github.nas2077.Syllark.metainfo.xml
+    dst: /usr/share/metainfo/io.github.nas2077.Syllark.metainfo.xml
+  - src: ./src/icon.png
+    dst: /usr/share/icons/hicolor/512x512/apps/io.github.nas2077.Syllark.png
+  - src: ./LICENSE
+    dst: /usr/share/licenses/syllark/LICENSE

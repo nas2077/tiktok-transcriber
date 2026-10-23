@@ -198,6 +198,7 @@
   "no such profile, check how you spelled it": "未找到主页，请检查名称是否正确",
   "no usable graphics card: whisper on a cpu is slow, turbo helps a lot": "没有可用的显卡：Whisper 在 CPU 上较慢，Turbo 可以明显提速",
   "no windows build of {p0} on pypi": "PyPI 上没有 {p0} 的 Windows 版本",
+  "no linux build of {p0} on pypi": "PyPI 上没有 {p0} 的 Linux 版本",
   "not downloaded": "未下载",
   "not installed": "未安装",
   "nvidia card found: fetching its libraries (about 1.2 gb, only the first time)": "检测到 NVIDIA 显卡，正在下载运行库（约 1.2 GB，仅首次需要）",

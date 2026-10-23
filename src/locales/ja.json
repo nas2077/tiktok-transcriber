@@ -198,6 +198,7 @@
   "no such profile, check how you spelled it": "プロフィールが見つかりません。名前を確認してください",
   "no usable graphics card: whisper on a cpu is slow, turbo helps a lot": "利用できる GPU がありません。CPU での Whisper は遅めですが、Turbo で短縮できます",
   "no windows build of {p0} on pypi": "PyPI に {p0} の Windows 版がありません",
+  "no linux build of {p0} on pypi": "PyPI に {p0} の Linux 版がありません",
   "not downloaded": "未ダウンロード",
   "not installed": "未インストール",
   "nvidia card found: fetching its libraries (about 1.2 gb, only the first time)": "NVIDIA の GPU を検出しました。ライブラリをダウンロード中（約 1.2 GB、初回のみ）",

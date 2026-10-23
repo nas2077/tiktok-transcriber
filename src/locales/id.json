@@ -198,6 +198,7 @@
   "no such profile, check how you spelled it": "profil tidak ditemukan: periksa penulisan namanya",
   "no usable graphics card: whisper on a cpu is slow, turbo helps a lot": "tidak ada kartu grafis yang cocok: Whisper lebih lambat di CPU; Turbo sangat membantu",
   "no windows build of {p0} on pypi": "tidak ada versi Windows untuk {p0} di PyPI",
+  "no linux build of {p0} on pypi": "tidak ada versi Linux untuk {p0} di PyPI",
   "not downloaded": "belum diunduh",
   "not installed": "belum terpasang",
   "nvidia card found: fetching its libraries (about 1.2 gb, only the first time)": "kartu NVIDIA ditemukan: mengunduh pustakanya (sekitar 1,2 GB, hanya saat pertama kali)",

@@ -198,6 +198,7 @@
   "no such profile, check how you spelled it": "لم يتم العثور على الحساب: تحقق من كتابة الاسم",
   "no usable graphics card: whisper on a cpu is slow, turbo helps a lot": "لا توجد بطاقة رسومات متوافقة: Whisper أبطأ على CPU، واستخدام Turbo يساعد كثيرًا",
   "no windows build of {p0} on pypi": "لا توجد نسخة Windows من {p0} على PyPI",
+  "no linux build of {p0} on pypi": "لا توجد نسخة Linux من {p0} على PyPI",
   "not downloaded": "لم يتم التنزيل",
   "not installed": "غير مثبّت",
   "nvidia card found: fetching its libraries (about 1.2 gb, only the first time)": "تم العثور على بطاقة NVIDIA: تنزيل مكتباتها (نحو 1.2 غيغابايت، في المرة الأولى فقط)",

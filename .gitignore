@@ -20,6 +20,7 @@ __pycache__/
 !/dev/build_docs.py
 !/dev/build_identity.py
 !/dev/build.ps1
+!/dev/build.sh
 !/dev/build.spec
 !/dev/collect_licenses.py
 !/dev/constraints.txt
@@ -27,6 +28,7 @@ __pycache__/
 !/dev/core_check.py
 !/dev/design_check.py
 !/dev/localization_check.py
+!/dev/make_packages.py
 !/dev/model_benchmark.py
 !/dev/model_binary_check.py
 !/dev/model_matrix_check.py
@@ -44,7 +46,15 @@ __pycache__/
 !/dev/screenshots.py
 !/dev/setup.ps1
 !/dev/ui_check.py
+!/dev/update_manifests.py
 !/dev/version_info.txt
+
+# Python package and Linux packaging outputs
+/build/
+/dist/
+*.egg-info/
+/.flatpak-builder/
+/packaging/linux/flatpak/syllark-bundle.tar.gz
 
 # Historical local reports and translated README drafts
 /docs/*.it.md

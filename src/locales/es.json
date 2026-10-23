@@ -198,6 +198,7 @@
   "no such profile, check how you spelled it": "perfil no encontrado: comprueba cómo has escrito el nombre",
   "no usable graphics card: whisper on a cpu is slow, turbo helps a lot": "no hay una tarjeta gráfica compatible: Whisper tarda más en la CPU; Turbo ayuda bastante",
   "no windows build of {p0} on pypi": "no hay una versión de {p0} para Windows en PyPI",
+  "no linux build of {p0} on pypi": "no hay una versión de {p0} para Linux en PyPI",
   "not downloaded": "no descargado",
   "not installed": "no instalado",
   "nvidia card found: fetching its libraries (about 1.2 gb, only the first time)": "tarjeta NVIDIA detectada: descargando sus bibliotecas (unos 1,2 GB, solo la primera vez)",

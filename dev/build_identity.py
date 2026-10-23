@@ -42,6 +42,8 @@ def main():
         entries.append(struct.pack('<BBBBHHII',size%256,size%256,0,0,1,32,len(data),offset))
         offset+=len(data)
     (ROOT/'src/icon.ico').write_bytes(struct.pack('<HHH',0,1,len(sizes))+b''.join(entries)+b''.join(images))
+    # macOS bundles and Linux desktop entries take a plain PNG
+    (ROOT/'src/icon.png').write_bytes(png(512))
     path=ROOT/'src/ui.html'
     text=path.read_text(encoding='utf-8')
     start=text.index('<svg',text.index('<div class="brand '))
@@ -50,7 +52,7 @@ def main():
             +shapes.replace('class="body"','fill="currentColor"').replace('class="accent"','fill="var(--pixel-orange)"')+'</svg>')
     text=text[:start]+inline+text[end:]
     path.write_bytes(text.encode('utf-8'))
-    print('Syllark SVG/PNG, six-size ICO and application header updated.')
+    print("Syllark SVG/PNG, six-size ICO, 512 px PNG and application header updated.")
 
 
 if __name__=='__main__':

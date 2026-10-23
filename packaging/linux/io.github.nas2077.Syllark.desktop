@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Syllark
+GenericName=Transcriber
+Comment=Readable transcripts from public clips, recognized on your computer
+Comment[it]=Trascrizioni leggibili da clip pubbliche, riconosciute sul tuo computer
+Exec=syllark
+Icon=io.github.nas2077.Syllark
+Terminal=false
+Categories=AudioVideo;Audio;Utility;
+Keywords=transcription;transcribe;speech;whisper;qwen;tiktok;subtitles;
+StartupNotify=true
+StartupWMClass=Syllark

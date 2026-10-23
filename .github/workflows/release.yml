@@ -1,0 +1,246 @@
+name: Release
+# Builds every package on its own system. A manual run (workflow_dispatch)
+# only builds and keeps the files as workflow artifacts. A v* tag also makes
+# a DRAFT release with all files and checksums; publishing it stays manual.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  PYTHON_VERSION: '3.12'
+  APPIMAGETOOL_VERSION: '1.9.1'
+  NFPM_VERSION: '2.48.0'
+
+jobs:
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+      - name: Build ZIP and installer
+        run: powershell -ExecutionPolicy Bypass -File dev\build.ps1 -Quiet -Installer
+      - name: Start the built app
+        run: |
+          $app = Start-Process -FilePath dev\build\dist\Syllark\Syllark.exe -PassThru
+          Start-Sleep -Seconds 40
+          if ($app.HasExited) { throw "Syllark exited early with code $($app.ExitCode)" }
+          Stop-Process -Id $app.Id -Force
+          $crash = Join-Path $env:LOCALAPPDATA 'TikTok Transcriber\crash.log'
+          if (Test-Path $crash) { Get-Content $crash; throw 'crash.log was written' }
+          Write-Host 'Syllark stayed open for 40 seconds.'
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: windows-x64
+          path: |
+            dev/dist/Syllark-*-windows-x64.zip
+            dev/dist/Syllark-*-windows-x64-setup.exe
+          if-no-files-found: error
+
+  macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Build app and disk image
+        run: bash dev/build.sh --strict
+      - name: Media library license
+        run: dev/.venv/bin/python -c "import av._core as c; m=c.library_meta['libavcodec']; print(m['license']); print(m['configuration'])"
+      - name: Start the built app
+        run: |
+          dev/build/dist/Syllark.app/Contents/MacOS/Syllark --version
+          dev/build/dist/Syllark.app/Contents/MacOS/Syllark &
+          pid=$!
+          sleep 40
+          kill -0 "$pid" || { echo "Syllark exited early"; exit 1; }
+          kill "$pid"
+          crash="$HOME/Library/Application Support/Syllark/crash.log"
+          if [ -f "$crash" ]; then cat "$crash"; exit 1; fi
+          echo "Syllark stayed open for 40 seconds."
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: macos-${{ matrix.arch }}
+          path: dev/dist/Syllark-*-macos-*.dmg
+          if-no-files-found: error
+
+  linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # 22.04 keeps the glibc floor at 2.35 for every package built here
+          - runner: ubuntu-22.04
+            arch: x86_64
+            nfpm: x86_64
+            nfpm_sha256: 6d7f9a28b2f397934403950fcbba83f598b08d02edbe79a0815b3b4897341750
+            appimagetool_sha256: ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0
+          - runner: ubuntu-22.04-arm
+            arch: aarch64
+            nfpm: arm64
+            nfpm_sha256: a9a75213763783b7669719e505474c748c5ad7dc66591a195619deb50f85c2f4
+            appimagetool_sha256: f0837e7448a0c1e4e650a93bb3e85802546e60654ef287576f46c71c126a9158
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: System libraries for Qt
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
+            libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 \
+            libegl1 libgl1 libnss3 libasound2 libxcomposite1 libxdamage1 libxrandr2 \
+            libxtst6 libxkbfile1 libdbus-1-3 desktop-file-utils appstream xvfb
+      - name: Packaging tools, checksums verified
+        run: |
+          curl -fsSL -o nfpm.tar.gz "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_Linux_${{ matrix.nfpm }}.tar.gz"
+          echo "${{ matrix.nfpm_sha256 }}  nfpm.tar.gz" | sha256sum -c -
+          sudo tar -xzf nfpm.tar.gz -C /usr/local/bin nfpm
+          curl -fsSL -o appimagetool "https://github.com/AppImage/appimagetool/releases/download/${APPIMAGETOOL_VERSION}/appimagetool-${{ matrix.arch }}.AppImage"
+          echo "${{ matrix.appimagetool_sha256 }}  appimagetool" | sha256sum -c -
+          sudo install -m755 appimagetool /usr/local/bin/appimagetool
+          rm nfpm.tar.gz appimagetool
+      - name: Validate desktop entry and AppStream data
+        run: |
+          desktop-file-validate packaging/linux/io.github.nas2077.Syllark.desktop
+          appstreamcli validate --no-net --explain packaging/linux/io.github.nas2077.Syllark.metainfo.xml
+      - name: Build bundle and packages
+        run: bash dev/build.sh --strict
+      - name: Media library license
+        run: dev/.venv/bin/python -c "import av._core as c; m=c.library_meta['libavcodec']; print(m['license']); print(m['configuration'])"
+      - name: Start the built app
+        run: |
+          dev/build/dist/Syllark/Syllark --version
+          set +e
+          timeout 40 xvfb-run -a dev/build/dist/Syllark/Syllark
+          code=$?
+          set -e
+          crash="$HOME/.local/share/syllark/crash.log"
+          if [ -f "$crash" ]; then cat "$crash"; exit 1; fi
+          [ "$code" = 124 ] || { echo "Syllark exited early with code $code"; exit 1; }
+          echo "Syllark stayed open for 40 seconds."
+      - name: Inspect packages
+        run: |
+          dpkg-deb --info dev/dist/*.deb
+          dpkg-deb --contents dev/dist/*.deb | grep -E 'usr/bin/syllark|applications/io.github.nas2077.Syllark.desktop'
+          ls -l dev/dist
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: linux-${{ matrix.arch }}
+          path: |
+            dev/dist/Syllark-*
+            dev/dist/*.deb
+            dev/dist/*.rpm
+            dev/dist/*.pkg.tar.zst
+          if-no-files-found: error
+
+  flatpak:
+    needs: linux
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-24.08
+      options: --privileged
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: linux-x86_64
+          path: linux
+      - name: Place the bundle beside the manifest
+        id: bundle
+        run: |
+          archive=$(ls linux/Syllark-*-linux-x86_64.tar.gz)
+          cp "$archive" packaging/linux/flatpak/syllark-bundle.tar.gz
+          version=$(basename "$archive" | sed 's/^Syllark-\(.*\)-linux-x86_64.tar.gz$/\1/')
+          echo "name=Syllark-$version-linux-x86_64.flatpak" >> "$GITHUB_OUTPUT"
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@79327416609af08178ad73b352877e51450790b3 # v6.8
+        with:
+          manifest-path: packaging/linux/flatpak/io.github.nas2077.Syllark.yml
+          bundle: ${{ steps.bundle.outputs.name }}
+          artifact-name: flatpak-x86_64
+          cache: false
+
+  python:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Build sdist and wheel
+        run: |
+          python -m pip install --disable-pip-version-check build twine
+          python -m build
+          python -m twine check --strict dist/*
+      - name: Install the wheel and run the command
+        run: |
+          python -m venv /tmp/try
+          /tmp/try/bin/pip install --disable-pip-version-check -q dist/*.whl
+          /tmp/try/bin/syllark --version
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: python
+          path: dist/*
+          if-no-files-found: error
+
+  release:
+    needs: [windows, macos, linux, flatpak, python]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: assets
+          merge-multiple: true
+      - name: Checksums and package-manager manifests
+        id: version
+        run: |
+          version=$(sed -n 's/^APP_VERSION = "\(.*\)"$/\1/p' src/tiktok_core.py)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          (cd assets && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt)
+          python3 dev/update_manifests.py "$version" assets/SHA256SUMS.txt
+          zip -r assets/package-manifests.zip Casks bucket packaging/winget packaging/aur
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-files
+          path: |
+            assets/SHA256SUMS.txt
+            assets/package-manifests.zip
+      - name: Draft release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          [ "${GITHUB_REF_NAME}" = "v$VERSION" ] || { echo "tag ${GITHUB_REF_NAME} does not match version $VERSION"; exit 1; }
+          gh release create "v$VERSION" --draft --verify-tag --title "Syllark $VERSION" \
+            --notes "See [CHANGELOG.md](https://github.com/nas2077/syllark/blob/v$VERSION/CHANGELOG.md). Verify downloads with SHA256SUMS.txt." \
+            assets/*

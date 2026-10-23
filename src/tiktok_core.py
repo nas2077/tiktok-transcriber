@@ -12,6 +12,7 @@ import tempfile
 import threading
 import time
 import unicodedata
+import desktop
 import tiktok_public
 from collections import deque
 from concurrent.futures import ThreadPoolExecutor
@@ -29,6 +30,7 @@ os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
 os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
 
 APP_NAME = "Syllark"
+APP_VERSION = "0.2.0"
 STORAGE_NAME = "TikTok Transcriber"
 FROZEN = bool(getattr(sys, "frozen", False))
 # where the program is: next to the .exe, or the project folder (the one
@@ -40,17 +42,17 @@ PROGRAM_DIR = (os.path.dirname(sys.executable) if FROZEN
 def data_dir():
     """
     where the settings, the window cache and the graphics card libraries live:
-    %LOCALAPPDATA%/TikTok Transcriber, like any other windows program. the
-    folder with the .exe stays as it was unpacked.
+    %LOCALAPPDATA%/TikTok Transcriber, like any other windows program
+    (~/Library/Application Support/Syllark on macos, ~/.local/share/syllark
+    on linux). the folder with the program stays as it was unpacked.
 
-    older versions kept them in a "data" folder next to the program (or
-    "dati", or in %LOCALAPPDATA% under another name): the first start moves
-    them here, so no setting is lost.
+    older windows versions kept them in a "data" folder next to the program
+    (or "dati", or in %LOCALAPPDATA% under another name): the first start
+    moves them here, so no setting is lost.
     """
-    base = os.environ.get("LOCALAPPDATA") or os.path.join(
-        os.path.expanduser("~"), "AppData", "Local")
-    home = os.path.join(base, STORAGE_NAME)
-    if not os.path.isdir(home):
+    base = desktop.data_base()
+    home = os.path.join(base, desktop.storage_name(STORAGE_NAME))
+    if desktop.WINDOWS and not os.path.isdir(home):
         for old in (os.path.join(PROGRAM_DIR, "data"), os.path.join(PROGRAM_DIR, "dati"),
                     os.path.join(PROGRAM_DIR, "src", "data"),
                     os.path.join(base, "tiktok-transcriber"), os.path.join(base, "trascrittore-tiktok")):
@@ -85,6 +87,10 @@ def _hook_cuda():
     except Exception:
         pass
 
+    if desktop.LINUX:
+        return _preload_cuda(roots)
+    if not desktop.WINDOWS:
+        return []   # macos has no cuda
     hooked, seen = [], set()
     for root in roots:
         for d in sorted(glob.glob(os.path.join(root, "nvidia", "*", "bin"))):
@@ -104,6 +110,42 @@ def _hook_cuda():
             except OSError:
                 pass
     return sorted(hooked)
+
+
+def _preload_cuda(roots):
+    """
+    linux reads LD_LIBRARY_PATH only when a program starts, so adding a folder
+    later changes nothing. loading the libraries by hand works instead: when
+    ctranslate2 or cudnn later ask for libcublas.so.12 by name, the system
+    hands them the copy that is already in memory. a library that needs one
+    not loaded yet fails the first round and gets another try.
+    """
+    import ctypes
+
+    files, seen = [], set()
+    for root in roots:
+        for d in sorted(glob.glob(os.path.join(root, "nvidia", "*", "lib"))):
+            name = os.path.basename(os.path.dirname(d))
+            libraries = sorted(glob.glob(os.path.join(d, "lib*.so*")))
+            if name in seen or not libraries:
+                continue
+            seen.add(name)
+            files += [(name, f) for f in libraries if f not in _hooked_dirs]
+    hooked = set()
+    for _ in range(4):
+        failed = []
+        for name, path in files:
+            try:
+                ctypes.CDLL(path, mode=ctypes.RTLD_GLOBAL)
+                _hooked_dirs.add(path)
+                hooked.add(name)
+            except OSError:
+                failed.append((name, path))
+        if not failed or len(failed) == len(files):
+            break
+        files = failed
+    already = {os.path.basename(os.path.dirname(os.path.dirname(p))) for p in _hooked_dirs}
+    return sorted(hooked | already)
 
 
 CUDA_DLLS = _hook_cuda()
@@ -205,24 +247,7 @@ LEGACY_OUTPUT_FOLDER_NAME = "Trascrizioni TikTok"
 TRANSCRIPT_RE = re.compile(r"^(\d{6,})\s*-\s*.*\.(md|txt)$", re.I)
 
 
-def documents_dir():
-    """
-    the real Documents folder.
-
-    with onedrive backup turned on (the default on a fresh windows 11) it is
-    not ~/Documents but ~/OneDrive/Documents, and writing into the first one
-    creates a second, orphaned folder nobody ever looks at.
-    """
-    try:
-        import ctypes
-
-        buf = ctypes.create_unicode_buffer(260)
-        # CSIDL_PERSONAL (5): the Documents folder, wherever the user moved it
-        if ctypes.windll.shell32.SHGetFolderPathW(None, 5, None, 0, buf) == 0 and buf.value:
-            return buf.value
-    except Exception:
-        pass
-    return os.path.join(os.path.expanduser("~"), "Documents")
+documents_dir = desktop.documents_dir
 
 
 def default_output_folder():
@@ -926,10 +951,12 @@ def gpu_available(name=None):
     inference, so the engine also does a dry run when it loads.
     """
     if name == "qwen3-asr":
+        # apple computers run it on Metal, everything else on Vulkan
+        backend, label = ("metal", "Metal") if desktop.MAC else ("vulkan", "Vulkan")
         try:
             import transcribe_cpp
-            available = transcribe_cpp.backend_available("vulkan")
-            return available, "Vulkan" if available else "processor"
+            available = transcribe_cpp.backend_available(backend)
+            return available, label if available else "processor"
         except Exception:
             return False, "processor"
     try:
@@ -989,19 +1016,28 @@ def _version_key(v):
 
 
 def _wheel(package, major=None):
-    """the newest stable windows wheel of a package: (url, size, version)"""
+    """the newest stable wheel of a package for this computer: (url, size, version)"""
     import json
+    import platform
     import urllib.request
 
+    if desktop.WINDOWS:
+        fits = lambda name: name.endswith("win_amd64.whl")
+    else:
+        machine = {"amd64": "x86_64", "arm64": "aarch64"}.get(platform.machine().lower(),
+                                                              platform.machine().lower())
+        fits = lambda name: "manylinux" in name and name.endswith(machine + ".whl")
     with urllib.request.urlopen(f"https://pypi.org/pypi/{package}/json", timeout=30) as r:
         data = json.load(r)
     for version in sorted(data["releases"], key=_version_key, reverse=True):
         if re.search(r"[a-z]", version) or (major and not version.startswith(major + ".")):
             continue
         for f in data["releases"][version]:
-            if f["filename"].endswith("win_amd64.whl") and not f.get("yanked"):
+            if fits(f["filename"]) and not f.get("yanked"):
                 return f["url"], f["size"], version
-    raise TikTokError(f"no windows build of {package} on pypi")
+    if desktop.WINDOWS:
+        raise TikTokError(f"no windows build of {package} on pypi")
+    raise TikTokError(f"no linux build of {package} on pypi")
 
 
 def install_cuda():
@@ -1032,9 +1068,11 @@ def install_cuda():
                     _setup("cuda", f"Downloading the graphics card libraries · {_gb(done)} of {_gb(total)}",
                            done / total)
         _setup("cuda", "Unpacking the graphics card libraries", done / total)
+        keep = (r"nvidia/[^/]+/bin/[^/]+\.dll" if desktop.WINDOWS
+                else r"nvidia/[^/]+/lib/lib[^/]+\.so[.0-9]*")
         with zipfile.ZipFile(part) as z:
             for member in z.namelist():
-                if re.fullmatch(r"nvidia/[^/]+/bin/[^/]+\.dll", member):
+                if re.fullmatch(keep, member):
                     target = os.path.join(CUDA_DIR, *member.split("/"))
                     os.makedirs(os.path.dirname(target), exist_ok=True)
                     with z.open(member) as src, open(target + ".partial", "wb") as dst:
@@ -1095,7 +1133,7 @@ def ensure_ready(name=DEFAULT_MODEL, log=None):
     """
     name = model_name(name)
     with _setup_lock:
-        if name != "qwen3-asr" and not CUDA_DLLS and nvidia_card():
+        if name != "qwen3-asr" and not desktop.MAC and not CUDA_DLLS and nvidia_card():
             if log:
                 log("nvidia card found: fetching its libraries (about 1.2 gb, only the first time)")
             try:

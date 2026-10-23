@@ -198,6 +198,7 @@
   "no such profile, check how you spelled it": "प्रोफ़ाइल नहीं मिली: नाम की वर्तनी जाँचें",
   "no usable graphics card: whisper on a cpu is slow, turbo helps a lot": "कोई उपयुक्त ग्राफ़िक्स कार्ड नहीं है: CPU पर Whisper धीमा है; Turbo से मदद मिलती है",
   "no windows build of {p0} on pypi": "PyPI पर {p0} का Windows संस्करण नहीं है",
+  "no linux build of {p0} on pypi": "PyPI पर {p0} का Linux संस्करण नहीं है",
   "not downloaded": "डाउनलोड नहीं हुआ",
   "not installed": "इंस्टॉल नहीं है",
   "nvidia card found: fetching its libraries (about 1.2 gb, only the first time)": "NVIDIA कार्ड मिला: उसकी लाइब्रेरी डाउनलोड हो रही हैं (लगभग 1.2 GB, सिर्फ़ पहली बार)",

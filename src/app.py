@@ -9,12 +9,16 @@ import sys
 import threading
 import time
 import traceback
-import webbrowser
 
 # where ui.html, vendor/ and the icon are: next to this file, or inside the
 # .exe's runtime folder when it runs as the built program
 HERE = getattr(sys, "_MEIPASS", None) or os.path.dirname(os.path.abspath(__file__))
+# installed with pip, the modules sit in a package folder of their own
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
 TITLE = "Syllark"
+
+import desktop  # noqa: E402  (only the standard library: safe before the crash handler)
 
 # a windowed .exe (and pythonw) has no console: sys.stderr is None, and the
 # first library that writes a progress bar there (the model download does)
@@ -30,8 +34,8 @@ def _report_crash(text):
     double clicking the shortcut simply did nothing. now it leaves a file and
     says so.
     """
-    base = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
-    path = os.path.join(base, "TikTok Transcriber", "crash.log")
+    home = os.path.join(desktop.data_base(), desktop.storage_name("TikTok Transcriber"))
+    path = os.path.join(home, "crash.log")
     try:
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "a", encoding="utf-8") as f:
@@ -39,23 +43,22 @@ def _report_crash(text):
     except OSError:
         path = "(could not write the crash log)"
     try:
-        import ctypes
         try:
             from localization import translate
-            with open(os.path.join(base, "TikTok Transcriber", "settings.json"), encoding="utf-8") as f:
+            with open(os.path.join(home, "settings.json"), encoding="utf-8") as f:
                 language = json.load(f).get("ui_language", "en")
             tr = lambda key, **params: translate(key, language, **params)
         except Exception:
             tr = lambda key, **params: key.format(**params)
-        ctypes.windll.user32.MessageBoxW(
-            None, tr("the app could not start.") + "\n\n" + text.strip().splitlines()[-1] + "\n\n"
-                  + tr("details in {p0}", p0=path),
-            TITLE, 0x10)
+        desktop.message_box(
+            tr("the app could not start.") + "\n\n" + text.strip().splitlines()[-1] + "\n\n"
+            + tr("details in {p0}", p0=path), TITLE)
     except Exception:
         print(text, file=sys.stderr)
 
 
 try:
+    desktop.prepare_window_engine()
     import webview
 
     import tiktok_core as core
@@ -260,28 +263,23 @@ bridge = Bridge()
 core.setup_listener = lambda e: bridge.send({"type": "setup", **e})
 
 
-# ------------------------------------------------------------------ windows bits
+# ------------------------------------------------------------------ system bits
 
 
-def keep_awake(on):
-    """
-    a profile of 500 videos takes the best part of an hour on a cpu, and a
-    laptop that goes to sleep after fifteen minutes stops it halfway. this
-    tells windows the machine is busy, for as long as the calling thread
-    needs it (the screen can still turn off).
-    """
-    try:
-        import ctypes
-
-        ES_CONTINUOUS, ES_SYSTEM_REQUIRED = 0x80000000, 0x00000001
-        ctypes.windll.kernel32.SetThreadExecutionState(
-            ES_CONTINUOUS | (ES_SYSTEM_REQUIRED if on else 0))
-    except Exception:
-        pass
+keep_awake = desktop.keep_awake
 
 
 def flash_taskbar():
     """a long run that finishes while you are elsewhere blinks in the taskbar"""
+    if desktop.MAC:
+        try:
+            from AppKit import NSApplication
+
+            # NSInformationalRequest (10): one bounce of the dock icon
+            NSApplication.sharedApplication().requestUserAttention_(10)
+        except Exception:
+            pass
+        return
     if not _hwnd:
         return
     try:
@@ -625,14 +623,8 @@ class Api:
         saved = self._setting("ui_language", "")
         if saved:
             return normalize(saved)
-        try:
-            import ctypes
-            buffer = ctypes.create_unicode_buffer(85)
-            if ctypes.windll.kernel32.GetUserDefaultLocaleName(buffer, len(buffer)):
-                return normalize(buffer.value)
-        except Exception:
-            pass
-        return "en"
+        system = desktop.user_locale()
+        return normalize(system) if system else "en"
 
     def _folder(self):
         """
@@ -685,20 +677,20 @@ class Api:
         path = path or self._folder()
         try:
             os.makedirs(path, exist_ok=True)
-            os.startfile(path)
+            desktop.open_path(path)
             return {"ok": True}
         except Exception as e:
             return {"ok": False, "error": str(e)}
 
     def open_link(self, url):
         if str(url or "").startswith(("http://", "https://")):
-            webbrowser.open(url)
+            desktop.open_link(url)
         return {"ok": True}
 
     def open_file(self, path):
         try:
             if path and os.path.exists(path):
-                os.startfile(path)
+                desktop.open_path(path)
                 return {"ok": True}
             return {"ok": False, "error": "the file is not there"}
         except Exception as e:
@@ -1020,6 +1012,9 @@ def read_interface():
     with open(os.path.join(HERE, "controls.js"), encoding="utf-8") as f:
         html = html.replace('<script src="controls.js"></script>',
                             "<script>\n" + f.read().replace("</script", "<\\/script") + "\n</script>")
+    if not desktop.WINDOWS:
+        # the system draws the window's buttons there: the page hides its own
+        html = html.replace("<body>", '<body data-frame="native">', 1)
     return html
 
 
@@ -1034,24 +1029,12 @@ def saved_theme():
 
 
 def dark_theme():
-    """the theme the window opens in: the saved choice, otherwise windows'"""
+    """the theme the window opens in: the saved choice, otherwise the system's"""
     theme = saved_theme()
     return system_dark_theme() if theme is None else theme == "dark"
 
 
-def system_dark_theme():
-    """reads from the registry whether windows is in dark mode"""
-    try:
-        import winreg
-
-        k = winreg.OpenKey(
-            winreg.HKEY_CURRENT_USER,
-            r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize",
-        )
-        light, _ = winreg.QueryValueEx(k, "AppsUseLightTheme")
-        return not light
-    except Exception:
-        return True
+system_dark_theme = desktop.system_dark_theme
 
 
 def handle(w=None):
@@ -1069,6 +1052,8 @@ def handle(w=None):
 
 def is_maximized():
     """ask windows: it is the only one that really knows"""
+    if not desktop.WINDOWS:
+        return _maximized
     try:
         import ctypes
 
@@ -1143,32 +1128,8 @@ def fix_window(w):
         })
 
 
-_instance = None
-
-
 def already_running():
-    """
-    a second double click on the shortcut used to open a second window, which
-    loaded a second copy of whisper next to the first. now it brings the
-    window that is already open to the front and leaves.
-    """
-    global _instance
-    try:
-        import ctypes
-
-        k = ctypes.WinDLL("kernel32", use_last_error=True)
-        k.CreateMutexW.restype = ctypes.c_void_p
-        _instance = k.CreateMutexW(None, False, "Local\\tiktok-transcriber")
-        if ctypes.get_last_error() != 183:  # ERROR_ALREADY_EXISTS
-            return False
-        u = ctypes.windll.user32
-        hwnd = u.FindWindowW(None, TITLE)
-        if hwnd:
-            u.ShowWindow(hwnd, 9)  # SW_RESTORE
-            u.SetForegroundWindow(hwnd)
-        return True
-    except Exception:
-        return False
+    return desktop.already_running(TITLE)
 
 
 def hide_runtime():
@@ -1177,7 +1138,7 @@ def hide_runtime():
     it needs. a zip does not carry the hidden flag, so the program sets it
     itself: what you see in the folder is the .exe and nothing else.
     """
-    if not core.FROZEN:
+    if not core.FROZEN or not desktop.WINDOWS:
         return
     try:
         import ctypes
@@ -1197,13 +1158,14 @@ def main():
     if already_running():
         return
     hide_runtime()
-    try:
-        import ctypes
+    if desktop.WINDOWS:
+        try:
+            import ctypes
 
-        # its own taskbar group and icon, instead of being lumped with python
-        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("tiktok-transcriber")
-    except Exception:
-        pass
+            # its own taskbar group and icon, instead of being lumped with python
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("tiktok-transcriber")
+        except Exception:
+            pass
     threading.Thread(target=core.clean_temp, daemon=True).start()
 
     api = Api()
@@ -1214,7 +1176,10 @@ def main():
         width=1280,
         height=860,
         min_size=(1000, 680),
-        frameless=True,
+        # windows gets the app's own title bar. macos and linux keep the
+        # system's: the buttons people expect there, and wayland does not let
+        # a program move its own window by hand anyway.
+        frameless=desktop.WINDOWS,
         easy_drag=False,  # drag from the title bar only, not from the whole window
         resizable=True,
         # the `fondo` of the Nas design system, so nothing flashes before the
@@ -1222,23 +1187,53 @@ def main():
         background_color="#1B2632" if dark_theme() else "#EEE9DF",
         text_select=True,  # the css decides what is selectable, so the log can be copied
     )
-    window.events.shown += lambda: fix_window(window)
+    if desktop.WINDOWS:
+        window.events.shown += lambda: fix_window(window)
+    else:
+        window.events.maximized += lambda: _remember_maximized(True)
+        window.events.restored += lambda: _remember_maximized(False)
     # The chosen model/libraries download on first use after public discovery.
     # Opening Options must not start downloading the default before the user
     # can choose a smaller model, or before an invalid link has been rejected.
     bridge.start()
     webview.start(
-        gui="edgechromium", debug=False, private_mode=False, storage_path=WEBVIEW_CACHE
+        gui=window_engine(), debug=False, private_mode=False, storage_path=WEBVIEW_CACHE,
+        icon=os.path.join(HERE, "icon.png") if desktop.LINUX else None,
     )
 
 
-if __name__ == "__main__":
+def _remember_maximized(state):
+    global _maximized
+    _maximized = state
+
+
+def window_engine():
+    """
+    WebView2 on windows, the system's WebKit on macos. on linux the built
+    bundle carries Qt; from source pywebview picks whichever of Qt and GTK is
+    installed.
+    """
+    if desktop.WINDOWS:
+        return "edgechromium"
+    if desktop.LINUX and core.FROZEN:
+        return "qt"
+    return None
+
+
+def run():
+    """the `syllark` command and the built program both start here"""
     try:
         if len(sys.argv) in (4, 6) and sys.argv[1] == "--verify-runtime":
-            from runtime_check import run
-            run(*sys.argv[2:])
+            from runtime_check import run as verify
+            verify(*sys.argv[2:])
+        elif len(sys.argv) == 2 and sys.argv[1] in ("--version", "-V"):
+            print(f"{TITLE} {core.APP_VERSION}")
         else:
             main()
     except Exception:
         _report_crash(traceback.format_exc())
         raise
+
+
+if __name__ == "__main__":
+    run()

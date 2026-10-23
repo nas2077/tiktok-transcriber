@@ -198,6 +198,7 @@
   "no such profile, check how you spelled it": "프로필을 찾지 못했어요. 이름을 확인해 주세요",
   "no usable graphics card: whisper on a cpu is slow, turbo helps a lot": "사용 가능한 그래픽 카드가 없어요. CPU에서는 Whisper가 느리지만, Turbo를 쓰면 도움이 돼요",
   "no windows build of {p0} on pypi": "PyPI에 {p0}의 Windows 버전이 없어요",
+  "no linux build of {p0} on pypi": "PyPI에 {p0}의 Linux 버전이 없어요",
   "not downloaded": "다운로드 안 됨",
   "not installed": "설치 안 됨",
   "nvidia card found: fetching its libraries (about 1.2 gb, only the first time)": "NVIDIA 그래픽 카드를 찾았어요. 라이브러리 다운로드 중 (약 1.2 GB, 처음에만 필요해요)",
