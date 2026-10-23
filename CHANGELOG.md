@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 — unreleased
+## 0.2.0 — 2026-10-23
 
 Syllark is now **TikTok Transcriber**, on macOS and Linux too, with more ways to
 install it. The repository moved to `nas2077/tiktok-transcriber`; old links redirect.
@@ -14,12 +14,20 @@ install it. The repository moved to `nas2077/tiktok-transcriber`; old links redi
 - Windows: a per-user installer with Start menu entry and uninstaller, next to the
   portable ZIP; Scoop and winget manifests.
 - One-line terminal installs (`install.sh`, `install.ps1`) that verify SHA-256
-  before installing, and a Python package (`pipx install tiktok-transcriber`).
+  before installing, and a Python wheel for `pipx install` from the release.
+- The Linux packages use the system's C++ runtime and the libraries its OpenGL
+  driver needs: on Ubuntu 24.04, Debian 13, Fedora 42, Arch and openSUSE the
+  window aborted with "Could not initialize GLX" before. Docks pair the window
+  with its menu entry and icon.
 - macOS and Linux keep the system title bar; Windows keeps the app's own.
 - All packages keep LGPL-only FFmpeg libraries without x264/x265. The Linux window
   uses the LGPL PySide6.
 - Release workflow: every package is built on its own system and started as a
   smoke test; a version tag drafts the release with checksums and manifests.
+- Gallery: a profile explored right after stopping another no longer receives
+  the previous profile's last videos. Saved choices show in every picker at
+  startup. Video links stay the TikTok page, never a signed file address.
+- Windows: a pinned taskbar shortcut and the running window share one button.
 - certifi 2026.10.19 fixes PYSEC-2026-4320.
 
 ## 0.1.0 — 2026-10-15
