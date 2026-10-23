@@ -9,7 +9,7 @@ and downloaded model terms are described in the third-party notices.
 | [av](https://github.com/PyAV-Org/PyAV/issues) | 18.1.0+lgpl.1 | BSD-3-Clause |
 | bottle | 0.13.4 | MIT License |
 | [brotli](https://github.com/google/brotli) | 1.2.0 | MIT |
-| [certifi](https://github.com/certifi/python-certifi) | 2026.7.22 | Mozilla Public License 2.0 (MPL 2.0) |
+| [certifi](https://github.com/certifi/python-certifi) | 2026.10.19 | Mozilla Public License 2.0 (MPL 2.0) |
 | [cffi](https://cffi.readthedocs.io/) | 2.1.1 | MIT-0 |
 | [charset-normalizer](https://github.com/jawah/charset_normalizer/blob/master/CHANGELOG.md) | 3.5.2 | MIT |
 | [click](https://click.palletsprojects.com/page/changes/) | 8.5.0 | BSD-3-Clause |

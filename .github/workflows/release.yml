@@ -64,6 +64,8 @@ jobs:
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+      - name: Build tools
+        run: command -v pkg-config || brew install pkgconf
       - name: Build app and disk image
         run: bash dev/build.sh --strict
       - name: Media library license
@@ -96,7 +98,8 @@ jobs:
             nfpm: x86_64
             nfpm_sha256: 6d7f9a28b2f397934403950fcbba83f598b08d02edbe79a0815b3b4897341750
             appimagetool_sha256: ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0
-          - runner: ubuntu-22.04-arm
+          # Qt publishes its ARM Linux wheels for glibc 2.39 and newer only
+          - runner: ubuntu-24.04-arm
             arch: aarch64
             nfpm: arm64
             nfpm_sha256: a9a75213763783b7669719e505474c748c5ad7dc66591a195619deb50f85c2f4
@@ -114,8 +117,11 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
             libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 \
-            libegl1 libgl1 libnss3 libasound2 libxcomposite1 libxdamage1 libxrandr2 \
-            libxtst6 libxkbfile1 libdbus-1-3 desktop-file-utils appstream xvfb
+            libegl1 libgl1 libnss3 libxcomposite1 libxdamage1 libxrandr2 \
+            libxtst6 libxkbfile1 libdbus-1-3 desktop-file-utils appstream xvfb \
+            zlib1g-dev pkg-config
+          # renamed libasound2t64 on 24.04
+          sudo apt-get install -y --no-install-recommends libasound2t64 || sudo apt-get install -y --no-install-recommends libasound2
       - name: Packaging tools, checksums verified
         run: |
           curl -fsSL -o nfpm.tar.gz "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_Linux_${{ matrix.nfpm }}.tar.gz"

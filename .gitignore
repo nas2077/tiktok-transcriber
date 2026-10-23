@@ -19,6 +19,7 @@ __pycache__/
 !/dev/anonymous_network_check.py
 !/dev/build_docs.py
 !/dev/build_identity.py
+!/dev/build_media.sh
 !/dev/build.ps1
 !/dev/build.sh
 !/dev/build.spec

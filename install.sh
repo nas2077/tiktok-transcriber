@@ -100,11 +100,14 @@ install_linux() {
     if ldd --version 2>&1 | grep -qi musl; then
         fail "this system uses musl (like Alpine). Syllark needs a glibc distribution; try the Flatpak."
     fi
+    # x86_64 is built on Ubuntu 22.04, aarch64 on 24.04 (Qt's ARM wheels need it)
+    if [ "$arch" = x86_64 ]; then floor=35; systems="Ubuntu 22.04, Debian 12, Fedora 36, RHEL 9"
+    else floor=39; systems="Ubuntu 24.04, Debian 13, Fedora 40"; fi
     glibc=$(ldd --version 2>/dev/null | sed -n '1s/.* \([0-9][0-9]*\.[0-9][0-9]*\)$/\1/p')
     if [ -n "$glibc" ]; then
         major=${glibc%%.*}; minor=${glibc#*.}
-        if [ "$major" -lt 2 ] || { [ "$major" -eq 2 ] && [ "$minor" -lt 35 ]; }; then
-            say "Warning: glibc $glibc found, Syllark is built for 2.35 or newer (Ubuntu 22.04, Debian 12, Fedora 36, RHEL 9)."
+        if [ "$major" -lt 2 ] || { [ "$major" -eq 2 ] && [ "$minor" -lt "$floor" ]; }; then
+            say "Warning: glibc $glibc found, Syllark for $arch needs 2.$floor or newer ($systems or later)."
         fi
     fi
     name="Syllark-$VERSION-linux-$arch.tar.gz"

@@ -1,11 +1,12 @@
 # Architecture
 
 Syllark uses Python for media processing and a local HTML interface rendered
-by WebView2. It has no application server.
+by the system's web view: WebView2 on Windows, WebKit on macOS, Qt WebEngine on
+Linux. It has no application server.
 
 ```mermaid
 flowchart LR
-  UI[Local WebView2 interface] --> Bridge[Python bridge]
+  UI[Local web view interface] --> Bridge[Python bridge]
   Bridge --> Feed[Public TikTok discovery]
   Feed --> Download[Download queue]
   Download --> Speech[Shared local speech engine]
@@ -16,6 +17,7 @@ flowchart LR
 | Module | Responsibility |
 |---|---|
 | `src/app.py` | Window, settings, bridge, gallery jobs, batched UI events |
+| `src/desktop.py` | Per-system folders, opening files, sleep prevention, theme, locale, single instance |
 | `src/tiktok_public.py` | Anonymous public embed discovery and playable media |
 | `src/tiktok_core.py` | Feed pagination, downloads, engine selection, queues, exports |
 | `src/natural_asr.py` | Native Qwen runtime, VAD, language boundaries, cancellation |

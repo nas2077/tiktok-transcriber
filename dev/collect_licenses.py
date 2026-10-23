@@ -85,7 +85,15 @@ def main():
                           'license': license_name(distribution), 'upstream': home,
                           'license_files': copied})
     (ROOT/'docs/dependencies.json').write_bytes((json.dumps(inventory,indent=2)+'\n').encode())
-    (ROOT/'dev/constraints.txt').write_bytes(('\n'.join(f'{d["name"]}=={d["version"].split("+")[0]}' for d in inventory)+'\n').encode())
+    # Pins of packages only another system installs (the Windows or Linux
+    # window library) stay as they are; this system's packages are updated.
+    pins = {}
+    for line in (ROOT/'dev/constraints.txt').read_text(encoding='utf-8').splitlines():
+        if '==' in line:
+            name, pinned = line.split('==', 1)
+            pins[canonicalize_name(name)] = pinned.strip()
+    pins.update({d['name']: d['version'].split('+')[0] for d in inventory})
+    (ROOT/'dev/constraints.txt').write_bytes(('\n'.join(f'{n}=={v}' for n, v in sorted(pins.items()))+'\n').encode())
     python_license = Path(sys.base_prefix)/'LICENSE.txt'
     if python_license.exists():
         shutil.copy2(python_license,ROOT/'src/licenses/Python-LICENSE.txt')

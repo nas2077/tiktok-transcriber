@@ -40,7 +40,7 @@
   },
   {
     "name": "certifi",
-    "version": "2026.7.22",
+    "version": "2026.10.19",
     "license": "Mozilla Public License 2.0 (MPL 2.0)",
     "upstream": "https://github.com/certifi/python-certifi",
     "license_files": [

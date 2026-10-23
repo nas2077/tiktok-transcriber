@@ -29,6 +29,8 @@ def prepare_window_engine():
     """
     if not LINUX:
         return
+    # the LGPL Qt bindings, even when PyQt is installed next to them
+    os.environ.setdefault("QT_API", "pyside6")
     blocked = os.path.exists("/.flatpak-info")
     try:
         with open("/proc/sys/kernel/apparmor_restrict_unprivileged_userns") as f:

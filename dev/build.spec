@@ -54,9 +54,9 @@ if MAC:
     hiddenimports += ["webview.platforms.cocoa", "AppKit", "Foundation", "WebKit",
                       "Quartz", "UniformTypeIdentifiers", "objc"]
 elif LINUX:
-    hiddenimports += ["webview.platforms.qt", "qtpy", "PyQt6.QtCore", "PyQt6.QtGui",
-                      "PyQt6.QtWidgets", "PyQt6.QtNetwork", "PyQt6.QtWebChannel",
-                      "PyQt6.QtWebEngineCore", "PyQt6.QtWebEngineWidgets"]
+    hiddenimports += ["webview.platforms.qt", "qtpy", "PySide6.QtCore", "PySide6.QtGui",
+                      "PySide6.QtWidgets", "PySide6.QtNetwork", "PySide6.QtWebChannel",
+                      "PySide6.QtWebEngineCore", "PySide6.QtWebEngineWidgets"]
 
 # The native provider is discovered through its Python package entry point.
 for package in ("transcribe-cpp", "transcribe-cpp-native"):
@@ -68,7 +68,8 @@ if not LINUX:
     excludes += ["PyQt5", "PyQt6", "PySide2", "PySide6", "qtpy", "webview.platforms.qt",
                  "webview.platforms.gtk", "gi"]
 else:
-    excludes += ["PyQt5", "PySide2", "PySide6", "webview.platforms.gtk", "gi"]
+    # PySide6 (LGPL) only: PyQt is GPL
+    excludes += ["PyQt5", "PyQt6", "PySide2", "webview.platforms.gtk", "gi"]
 
 a = Analysis(
     [os.path.join(SRC, "app.py")],
