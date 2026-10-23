@@ -10,7 +10,8 @@
 # version and to stay open for 40 seconds without a crash log.
 set -u
 kind=$1
-packages=$2
+# absolute: apt reads "pkg/x.deb" as a package name to download
+packages=$(cd "$2" && pwd)
 
 desktop_basics() {
     # Xvfb plays the screen; Mesa's DRI drivers give it OpenGL, as on a desktop
@@ -45,7 +46,7 @@ case "$kind" in
             DEBIAN_FRONTEND=noninteractive apt-get install -y libnss3 libasound2 libgl1 libegl1 \
                 libxkbcommon0 libfontconfig1 libdbus-1-3 libwayland-server0
         fi
-        image=$(ls "$PWD/$packages"/*.AppImage)
+        image=$(ls "$packages"/*.AppImage)
         chmod +x "$image"
         printf '#!/bin/sh\nAPPIMAGE_EXTRACT_AND_RUN=1 exec "%s" "$@"\n' "$image" > /usr/local/bin/tiktok-transcriber
         chmod +x /usr/local/bin/tiktok-transcriber ;;
