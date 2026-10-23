@@ -63,8 +63,10 @@ Source: "{#SourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs 
 Type: filesandordirs; Name: "{app}\runtime"
 
 [Icons]
-Name: "{autoprograms}\TikTok Transcriber"; Filename: "{app}\TikTok Transcriber.exe"
-Name: "{autodesktop}\TikTok Transcriber"; Filename: "{app}\TikTok Transcriber.exe"; Tasks: desktopicon
+; the same AppUserModelID the app gives its window: a shortcut pinned to the
+; taskbar and the running window share one button instead of two
+Name: "{autoprograms}\TikTok Transcriber"; Filename: "{app}\TikTok Transcriber.exe"; AppUserModelID: "tiktok-transcriber"
+Name: "{autodesktop}\TikTok Transcriber"; Filename: "{app}\TikTok Transcriber.exe"; AppUserModelID: "tiktok-transcriber"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\TikTok Transcriber.exe"; Description: "{cm:LaunchProgram,TikTok Transcriber}"; Flags: nowait postinstall skipifsilent
