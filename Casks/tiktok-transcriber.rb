@@ -3,9 +3,9 @@
 cask "tiktok-transcriber" do
   arch arm: "arm64", intel: "x64"
 
-  version "0.2.0"
-  sha256 arm:   "72ed045d3e42f800903d0ea0e315f650581d0bcaa7636f5720b2bc8c0ac485bf",
-         intel: "d05dafc883dbe5326586ade3137ad071fd2be711bf37ec0cd16845d2c1ba00d2"
+  version "0.2.1"
+  sha256 arm:   "6badd64d813d8598f70fbfb597f3092d63ba0d177022eb72d7bb51159ee43e76",
+         intel: "78531d5e834cefa91cc22d5420c88e6d5e07264952bf744d2f4d36393dbfc438"
 
   url "https://github.com/nas2077/tiktok-transcriber/releases/download/v#{version}/TikTok-Transcriber-#{version}-macos-#{arch}.dmg"
   name "TikTok Transcriber"

@@ -1,13 +1,13 @@
 {
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "Readable transcripts from public TikTok clips and profiles, recognized locally",
     "homepage": "https://github.com/nas2077/tiktok-transcriber",
     "license": "MIT",
     "notes": "Models download on first use into %LOCALAPPDATA%\\TikTok Transcriber.",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.0/TikTok-Transcriber-0.2.0-windows-x64.zip",
-            "hash": "479ba4b89601e9b080fceab28ee64b4004095c0a28046cbd8197f4f50a159fcf"
+            "url": "https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/TikTok-Transcriber-0.2.1-windows-x64.zip",
+            "hash": "92ca9058712ce84527b89ac0929eb65a19f4ec1d047bf23bdb242f66a2566898"
         }
     },
     "extract_dir": "TikTok Transcriber",
