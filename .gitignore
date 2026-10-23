@@ -28,6 +28,7 @@ __pycache__/
 !/dev/controls_check.py
 !/dev/core_check.py
 !/dev/design_check.py
+!/dev/distro_check.sh
 !/dev/element.py
 !/dev/localization_check.py
 !/dev/make_packages.py

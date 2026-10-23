@@ -253,61 +253,14 @@ jobs:
     timeout-minutes: 30
     container: ${{ matrix.image }}
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: linux-${{ matrix.arch }}
           path: pkg
-      - name: Install with the package manager
+      - name: Install with the package manager and start the app
         shell: sh
-        run: |
-          set -eu
-          case "${{ matrix.kind }}" in
-            deb)
-              apt-get update
-              DEBIAN_FRONTEND=noninteractive apt-get install -y ./pkg/*.deb ;;
-            rpm)
-              if command -v dnf >/dev/null; then dnf install -y ./pkg/*.rpm
-              else zypper --non-interactive install --allow-unsigned-rpm ./pkg/*.rpm; fi ;;
-            arch)
-              pacman -Syu --noconfirm
-              pacman -U --noconfirm ./pkg/*.pkg.tar.zst ;;
-            appimage)
-              # the libraries a desktop already has, then the AppImage itself
-              if command -v dnf >/dev/null; then
-                dnf install -y nss alsa-lib mesa-libGL mesa-libEGL libxkbcommon fontconfig dbus-libs
-              else
-                apt-get update
-                DEBIAN_FRONTEND=noninteractive apt-get install -y libnss3 libasound2 libgl1 libegl1 libxkbcommon0 libfontconfig1 libdbus-1-3
-              fi
-              chmod +x pkg/*.AppImage
-              printf '#!/bin/sh\nAPPIMAGE_EXTRACT_AND_RUN=1 exec %s "$@"\n' "$(ls "$PWD"/pkg/*.AppImage)" > /usr/local/bin/tiktok-transcriber
-              chmod +x /usr/local/bin/tiktok-transcriber ;;
-          esac
-      - name: A virtual X11 screen, like a desktop has
-        shell: sh
-        run: |
-          # best effort: without it the app runs on Qt's offscreen platform
-          if command -v apt-get >/dev/null; then DEBIAN_FRONTEND=noninteractive apt-get install -y xvfb xauth || true
-          elif command -v dnf >/dev/null; then dnf install -y xorg-x11-server-Xvfb xorg-x11-xauth which || true
-          elif command -v zypper >/dev/null; then zypper --non-interactive install xvfb-run || true
-          elif command -v pacman >/dev/null; then pacman -S --noconfirm xorg-server-xvfb xorg-xauth || true
-          fi
-      - name: Start the installed app
-        shell: sh
-        run: |
-          set -u
-          tiktok-transcriber --version
-          code=0
-          if command -v xvfb-run >/dev/null; then
-            timeout 40 xvfb-run -a tiktok-transcriber || code=$?
-          else
-            echo "no Xvfb here: using Qt's offscreen platform"
-            QT_QPA_PLATFORM=offscreen timeout 40 tiktok-transcriber || code=$?
-          fi
-          crash="$HOME/.local/share/tiktok-transcriber/crash.log"
-          if [ -f "$crash" ]; then cat "$crash"; exit 1; fi
-          [ "$code" = 124 ] || { echo "TikTok Transcriber exited early with code $code"; exit 1; }
-          echo "Installed on ${{ matrix.image }} (${{ matrix.kind }}) and stayed open for 40 seconds."
+        run: sh dev/distro_check.sh ${{ matrix.kind }} pkg
 
   flatpak:
     needs: linux
