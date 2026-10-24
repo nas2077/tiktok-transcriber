@@ -7,7 +7,7 @@ permissions:
 jobs:
   repro:
     runs-on: windows-2025
-    timeout-minutes: 20
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
@@ -28,7 +28,8 @@ jobs:
           }
           $exe = Join-Path $dest 'TikTok Transcriber\TikTok Transcriber.exe'
           Get-Item -LiteralPath $exe -Stream * | Format-Table Stream, Length
-          $app = Start-Process -FilePath $exe -PassThru
+          # CreateProcess: ShellExecute would wait on the security prompt for a downloaded .exe
+          $app = [Diagnostics.Process]::Start([Diagnostics.ProcessStartInfo]@{ FileName = $exe; UseShellExecute = $false })
           Start-Sleep -Seconds 40
           Write-Host "exited: $($app.HasExited)"
           if (-not $app.HasExited) { Stop-Process -Id $app.Id -Force }
