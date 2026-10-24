@@ -18,7 +18,7 @@ and downloaded model terms are described in the third-party notices.
 | [ctranslate2](https://opennmt.net) | 4.8.3 | MIT |
 | [curl-cffi](https://github.com/lexiforest/curl_cffi) | 0.16.3 | MIT |
 | [faster-whisper](https://github.com/SYSTRAN/faster-whisper) | 1.2.1 | MIT License |
-| [filelock](https://py-filelock.readthedocs.io) | 4.1.1 | MIT |
+| [filelock](https://py-filelock.readthedocs.io) | 4.2.1 | MIT |
 | [flatbuffers](https://google.github.io/flatbuffers/) | 25.12.19 | Apache Software License |
 | [fsspec](https://filesystem-spec.readthedocs.io/en/latest/changelog.html) | 2026.9.0 | BSD-3-Clause |
 | [h11](https://github.com/python-hyper/h11) | 0.16.0 | MIT License |

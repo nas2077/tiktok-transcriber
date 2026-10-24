@@ -30,7 +30,7 @@ os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
 os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
 
 APP_NAME = "TikTok Transcriber"
-APP_VERSION = "0.2.1"
+APP_VERSION = "0.2.2"
 STORAGE_NAME = "TikTok Transcriber"
 FROZEN = bool(getattr(sys, "frozen", False))
 # where the program is: next to the .exe, or the project folder (the one
