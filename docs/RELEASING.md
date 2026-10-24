@@ -68,8 +68,9 @@ how each system's FFmpeg libraries are sourced.
 
 `.github/workflows/release.yml` builds every package on its own system and starts
 each built app for 40 seconds as a smoke test (no model download). A `v*` tag
-whose version matches `APP_VERSION` creates a **draft** release with all packages,
-`SHA256SUMS.txt` and `package-manifests.zip`. Publishing the draft stays manual.
+whose version matches `APP_VERSION` publishes the release with all packages,
+`SHA256SUMS.txt` and `package-manifests.zip`, but only after every build, the
+portable ZIP check and every distribution container have passed.
 
 ## Package managers
 
@@ -97,8 +98,9 @@ release workflow runs it and attaches the result as `package-manifests.zip`.
 5. Inspect package contents, licenses, dependency inventory, and checksums.
 6. Keep the pinned upstream FFmpeg input archive and source materials available
    with the release, as documented in MEDIA.md.
-7. Tag the reviewed source commit, review the draft, publish it, then commit the
-   generated Homebrew and Scoop manifests and submit the others.
+7. Tag the reviewed source commit; the workflow publishes the release when every
+   check passes. Then commit the generated Homebrew and Scoop manifests and submit
+   the others.
 
 The initial source tag is `v0.1.0`. Model downloads remain at their pinned upstream
 repositories and are not included in any package.

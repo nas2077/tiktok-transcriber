@@ -10,6 +10,31 @@ Security update.
   lock files that model downloads use, to overwrite or delete the files of the
   person running the app, or to hold a lock past its timeout. Every 0.2.1
   package carried filelock 4.1.1; please update.
+- Windows: the portable ZIP opens. Explorer marks every file taken out of
+  a downloaded ZIP as coming from the internet, and the .NET Framework refused
+  the marked window libraries: 0.2.0 and 0.2.1 stopped with "the app could not
+  start". The app now clears the mark from its own runtime folder. The
+  installer was never affected. The release build now starts the extracted,
+  marked ZIP too.
+- Windows: without the Microsoft Edge WebView2 Runtime the app says so and
+  opens its download page, instead of showing a window that does not work.
+- Closing the window during a job ends the app at once. A copy still winding
+  down kept the one-window lock, and the next start did nothing; a second
+  start also no longer brings an Explorer folder named "TikTok Transcriber"
+  forward instead of the app.
+- Linux: the sleep inhibitor no longer outlives the app (the computer could
+  stay awake until restarted) or leaves a process behind after every job.
+- Links without "www", from m.tiktok.com, and photo posts open as that one
+  post; a photo link used to start its whole profile, and gallery photo posts
+  could fail with "unsupported URL".
+- Stop and the gallery's Cancel interrupt a Whisper transcription between
+  segments instead of waiting for the whole video.
+- Switching from Natural to Whisper in the gallery runs as many transcriptions
+  in parallel as Whisper can, not one.
+- Gallery: a card's state that arrived together with its batch was lost, and
+  the "already transcribed" count could miss the last batch.
+- macOS 11.0-11.2: the window no longer stops on language names or keyboard
+  focus that its older WebKit does not support.
 
 ## 0.2.1 — 2026-10-23
 

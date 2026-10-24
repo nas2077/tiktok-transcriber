@@ -66,6 +66,7 @@ def _report_crash(text):
 
 
 try:
+    desktop.unblock_runtime(HERE)
     desktop.prepare_window_engine()
     import webview
 
@@ -345,6 +346,7 @@ class Workshop:
         self.queued_download = set()
         self._queue_lock = threading.Lock()
         self._started = False
+        self._loops = 0
 
     # --------------------------------------------------------- engines
 
@@ -389,6 +391,8 @@ class Workshop:
         if task is None:
             return
         n = core.GPU_TRANSCRIBERS
+        with self._queue_lock:
+            self._loops += 1
         try:
             e = self.engine(lambda t, l=None: api._log(t, l), api._model())
             n = e.workers
@@ -396,10 +400,21 @@ class Workshop:
             # no silence here: if the engine fails to load the user has to
             # know why, otherwise all they see is transcriptions failing
             api._log(f"the transcription engine did not load: {e}", "err")
-        for _ in range(max(0, n - 1)):
-            threading.Thread(target=self._transcribe_loop, args=(api,), daemon=True).start()
+        self._grow(api, n)
         self._run_transcription(api, task)
         self._transcribe_loop(api)
+
+    def _grow(self, api, n):
+        """
+        as many transcription loops as the loaded model runs at once. they
+        were counted once, for the first model: switching from Natural (one
+        at a time) to Whisper on a processor (up to four) kept one loop.
+        """
+        with self._queue_lock:
+            extra = max(0, n - self._loops)
+            self._loops += extra
+        for _ in range(extra):
+            threading.Thread(target=self._transcribe_loop, args=(api,), daemon=True).start()
 
     def _transcribe_loop(self, api):
         while True:
@@ -446,8 +461,8 @@ class Workshop:
     def cancel(self, vid):
         """
         a queued video is dropped when its turn comes; one already being
-        downloaded is stopped right there; one being transcribed finishes the
-        transcription (whisper cannot be interrupted) and is thrown away.
+        downloaded is stopped right there; one being transcribed stops at the
+        next block (Natural) or segment (Whisper) and nothing is written.
         before, cancel only worked on the queued ones and on the others the
         button did nothing at all.
         """
@@ -507,6 +522,7 @@ class Workshop:
                 "timestamps": api._setting("timestamps", False),
             }
             engine = self.engine(lambda t, l=None: api._log(t, l), api._model())
+            self._grow(api, engine.workers)
             folder = api._profile_folder(video.get("handle"))
             core.transcribe_one(
                 video, folder, browser, engine, options,
@@ -814,7 +830,7 @@ class Api:
                     bridge.send({"type": "gal_batch", "run": run, "videos": group, "total": total})
 
                 r = core.explore_stream(
-                    url, browser, limit=int(limit) if limit else None,
+                    url, browser, limit=core.positive_limit(limit),
                     on_head=head, on_batch=batch,
                     stopped=halt.is_set,
                     video_link=video_link,
@@ -1184,6 +1200,15 @@ def main():
     threading.Thread(target=core.clean_temp, daemon=True).start()
 
     api = Api()
+    if not desktop.webview2_installed():
+        from localization import translate
+
+        desktop.message_box(translate(
+            "the window needs the Microsoft Edge WebView2 Runtime, which is not on this "
+            "computer. its download page opens now: install it, then start the app again.",
+            api._ui_language()), TITLE)
+        desktop.open_link(desktop.WEBVIEW2_DOWNLOAD)
+        return
     window = webview.create_window(
         TITLE,
         html=read_interface(),
@@ -1216,6 +1241,12 @@ def main():
         gui=window_engine(), debug=False, private_mode=False, storage_path=WEBVIEW_CACHE,
         icon=os.path.join(HERE, "icon.png") if desktop.LINUX else None,
     )
+    # the window is closed. a job, a download or a model load still winding
+    # down kept the process alive with nothing on screen, holding the
+    # one-window lock: the next start then did nothing at all. transcripts
+    # and settings are written atomically, so nothing half-written is left.
+    desktop.allow_sleep()
+    os._exit(0)
 
 
 def _remember_maximized(state):

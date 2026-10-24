@@ -296,5 +296,6 @@
   "Transcription models": "نماذج التفريغ",
   "Uses the graphics card": "يستخدم بطاقة الرسومات",
   "Uses the processor": "يستخدم المعالج",
-  "Runs on": "يعمل على"
+  "Runs on": "يعمل على",
+  "the window needs the Microsoft Edge WebView2 Runtime, which is not on this computer. its download page opens now: install it, then start the app again.": "تحتاج النافذة إلى Microsoft Edge WebView2 Runtime، وهو غير موجود على هذا الكمبيوتر. ستُفتح صفحة تنزيله الآن: ثبّته ثم شغّل التطبيق مرة أخرى."
 }

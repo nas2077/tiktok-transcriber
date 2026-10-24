@@ -43,7 +43,8 @@ window.__controlsDone=false;window.__controlsFailure=null;
     assert(document.scrollingElement.scrollTop===0,'root scrolled');
     assert(document.body.getBoundingClientRect().top===0,'body displaced');
     assert(q('.toolbar').getBoundingClientRect().top===0,'title bar displaced');
-    for(const id of ['w-min','w-max','w-close']){
+    // macOS and Linux keep the system's frame: the page hides its own buttons
+    for(const id of document.body.dataset.frame==='native'?[]:['w-min','w-max','w-close']){
       const r=q('#'+id).getBoundingClientRect();
       assert(r.top>=0&&r.bottom<=innerHeight&&r.width>0,id+' left viewport');
     }

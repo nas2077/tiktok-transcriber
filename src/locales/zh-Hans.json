@@ -296,5 +296,6 @@
   "Transcription models": "转录模型",
   "Uses the graphics card": "使用显卡",
   "Uses the processor": "使用处理器",
-  "Runs on": "运行设备"
+  "Runs on": "运行设备",
+  "the window needs the Microsoft Edge WebView2 Runtime, which is not on this computer. its download page opens now: install it, then start the app again.": "窗口需要 Microsoft Edge WebView2 Runtime，但这台电脑上没有。现在会打开它的下载页面：请安装后重新启动应用。"
 }

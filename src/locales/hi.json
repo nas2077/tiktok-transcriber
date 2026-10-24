@@ -296,5 +296,6 @@
   "Transcription models": "ट्रांसक्रिप्शन मॉडल",
   "Uses the graphics card": "ग्राफ़िक्स कार्ड का उपयोग करता है",
   "Uses the processor": "प्रोसेसर का उपयोग करता है",
-  "Runs on": "इन पर चलता है"
+  "Runs on": "इन पर चलता है",
+  "the window needs the Microsoft Edge WebView2 Runtime, which is not on this computer. its download page opens now: install it, then start the app again.": "विंडो को Microsoft Edge WebView2 Runtime चाहिए, जो इस कंप्यूटर पर नहीं है। इसका डाउनलोड पेज अभी खुलेगा: इसे इंस्टॉल करें, फिर ऐप दोबारा शुरू करें।"
 }

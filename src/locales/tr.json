@@ -296,5 +296,6 @@
   "Transcription models": "Transkripsiyon modelleri",
   "Uses the graphics card": "Ekran kartını kullanır",
   "Uses the processor": "İşlemciyi kullanır",
-  "Runs on": "Çalıştığı aygıt"
+  "Runs on": "Çalıştığı aygıt",
+  "the window needs the Microsoft Edge WebView2 Runtime, which is not on this computer. its download page opens now: install it, then start the app again.": "pencere için Microsoft Edge WebView2 Runtime gerekiyor ve bu bilgisayarda yok. İndirme sayfası şimdi açılıyor: kurun, ardından uygulamayı yeniden başlatın."
 }

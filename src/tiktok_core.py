@@ -409,7 +409,7 @@ def normalize_profile(text, _resolve=True):
         parts = urlsplit(url)
         if _resolve and (parts.hostname in ("vm.tiktok.com", "vt.tiktok.com") or parts.path.startswith("/t/")):
             return normalize_profile(_resolve_short_link(url), _resolve=False)
-        video = url if is_video_link(url) else None
+        video = canonical_post(url) if is_video_link(url) else None
         match = re.match(r"/@([\w.\-]+)", parts.path)
         if match:
             handle = match.group(1)
@@ -419,15 +419,29 @@ def normalize_profile(text, _resolve=True):
     raise TikTokError(f"'{t[:60]}' does not look like a tiktok profile")
 
 
-def _post_link(text):
-    """a TikTok page for one video or photo post, not a signed CDN file"""
-    url = _tiktok_url(str(text or ""))
-    return bool(url and re.fullmatch(r"/@[\w.\-]+/(video|photo)/\d+/?", urlsplit(url).path))
+_POST_PATH = re.compile(r"/@([\w.\-]+)/(?:video|photo)/(\d+)/?")
 
 
 def is_video_link(text):
-    url = _tiktok_url(text)
-    return bool(url and re.fullmatch(r"/@[\w.\-]+/video/\d+/?", urlsplit(url).path))
+    """one post: a video, or a photo post with its sound"""
+    url = _tiktok_url(str(text or ""))
+    return bool(url and _POST_PATH.fullmatch(urlsplit(url).path))
+
+
+# a TikTok page for one video or photo post, not a signed CDN file
+_post_link = is_video_link
+
+
+def canonical_post(text):
+    """
+    the one address every reader of a post accepts. yt-dlp only knows
+    www.tiktok.com/@x/video/<id>: a link without "www", from m.tiktok.com or
+    of a photo post failed with "unsupported url" when the public embed was
+    not enough, and a pasted photo post used to mean its whole profile.
+    """
+    url = _tiktok_url(str(text or ""))
+    match = url and _POST_PATH.fullmatch(urlsplit(url).path)
+    return f"https://www.tiktok.com/@{match[1]}/video/{match[2]}" if match else text
 
 
 # ------------------------------------------------------------------ public TikTok access
@@ -472,6 +486,7 @@ def _access_failure(error):
 
 def _extract_with_access(url, browser, options, download=True):
     """Public embed first, then yt-dlp. Never use a browser account."""
+    url = canonical_post(url)
     try:
         info = tiktok_public.video_info(url)
         with _ydl(None, options) as y:
@@ -546,8 +561,9 @@ def _iter_profile(profile_url, browser, limit=None, video_link=None, log=None):
     a real generator and not an already materialised list.
     """
     extra = {"extract_flat": "in_playlist", "skip_download": True}
+    limit = positive_limit(limit)
     if limit:
-        extra["playlistend"] = int(limit)
+        extra["playlistend"] = limit
 
     with _ydl(browser, extra) as y:
         name = None
@@ -615,8 +631,17 @@ def _iter_profile(profile_url, browser, limit=None, video_link=None, log=None):
                 continue
             yield _entry(v, author)
             count += 1
-            if limit and count >= int(limit):
+            if limit and count >= limit:
                 break
+
+
+def positive_limit(value):
+    """how many videos to take: a whole number above zero, otherwise all of them"""
+    try:
+        value = int(value)
+    except (TypeError, ValueError):
+        return None
+    return value if value > 0 else None
 
 
 def iter_profile(profile_url, browser=None, limit=None, video_link=None, log=None):
@@ -725,7 +750,7 @@ def download_full_video(url, folder, browser, on_progress=None, cancelled=None):
     transcription): this is the file the user keeps.
     """
     os.makedirs(folder, exist_ok=True)
-    expected = (re.search(r"/video/(\d+)", url or "") or [None, None])[1]
+    expected = (re.search(r"/video/(\d+)", canonical_post(url) or "") or [None, None])[1]
     opts = {
         "format": FULL_FORMAT,
         "outtmpl": os.path.join(folder, "%(id)s - %(title).60s.%(ext)s"),
@@ -1234,7 +1259,7 @@ class Engine:
         )
         list(segments)
 
-    def transcribe(self, path, language=None):
+    def transcribe(self, path, language=None, cancelled=None):
         if getattr(self, "_natural", None) is not None:
             result = self._natural.transcribe(path, language)
             self.device = self._natural.device
@@ -1257,6 +1282,10 @@ class Engine:
         )
         lines = []
         for s in segments:
+            # whisper works one segment at a time as they are read: a stop or
+            # a cancelled gallery card no longer waits for the whole video
+            if cancelled and cancelled():
+                raise Cancelled("cancelled")
             text = re.sub(r"\s+", " ", s.text).strip()
             if not text or _CREDITS.search(text):
                 continue
@@ -1280,7 +1309,7 @@ class Engine:
                 return result
             except TranscriptionCancelled:
                 raise Cancelled("cancelled") from None
-        return self.transcribe(path, language)
+        return self.transcribe(path, language, cancelled)
 
 
 def transcribe_audio(engine, path, language=None, cancelled=None):
@@ -1892,6 +1921,7 @@ class Transcriber:
                             chosen = self._fixed_language
                         lines, meta = transcribe_audio(engine, path, chosen, self.stop.is_set)
                         if self.stop.is_set():
+                            self._video_state(v["id"], "queued")
                             continue
                         lines, suspect = _strip_repeats(lines)
                         if suspect:

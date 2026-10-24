@@ -96,8 +96,9 @@
         event.preventDefault();focusOption(event.key==="Home"?0:options.length-1);
       }else if(event.key==="Tab"){
         const fields=search?[search,...options]:options;
-        if(event.shiftKey && document.activeElement===fields[0]){event.preventDefault();fields.at(-1)?.focus({preventScroll:true});}
-        else if(!event.shiftKey && document.activeElement===fields.at(-1)){event.preventDefault();fields[0]?.focus({preventScroll:true});}
+        const last=fields[fields.length-1];   // no .at(): macOS 11's WebKit lacks it
+        if(event.shiftKey && document.activeElement===fields[0]){event.preventDefault();last?.focus({preventScroll:true});}
+        else if(!event.shiftKey && document.activeElement===last){event.preventDefault();fields[0]?.focus({preventScroll:true});}
       }
     });
     position();anchor=new Map();

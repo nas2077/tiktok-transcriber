@@ -1081,6 +1081,7 @@ function handleEvent(e){
       }
 
       case "gal_done": {
+        flushCards();   // the count below must include the last batch
         fillSquares($("#gal-bar"), 1, false);
         const d=doneCount();
         endLoading("@"+(S.galHandle||"")+" · "+e.total+" videos · "+d+" already transcribed");
@@ -1243,6 +1244,9 @@ const WORK_TEXT = {
 };
 
 function cardState(id, state, extra){
+  /* the card may still be waiting for its frame: a state that arrived in the
+     same packet as its batch was dropped, and the card kept its old state */
+  if(!cards.has(String(id)) && incoming.length) flushCards();
   const c=cards.get(String(id)); if(!c) return;
   extra = extra || {};
   const working = !!WORK_TEXT[state];
@@ -1295,16 +1299,16 @@ function queueCards(list){
   incoming.push(...list);
   if(scheduled) return;
   scheduled=true;
-  requestAnimationFrame(()=>{
-    scheduled=false;
-    const group=incoming; incoming=[];
-    if(!group.length) return;
-    const frag=document.createDocumentFragment();
-    group.forEach(v=>{ if(!cards.has(String(v.id))) frag.appendChild(makeCard(v, S.galHandle)); });
-    $("#gal-grid").appendChild(frag);
-    $("#gal-empty").classList.add("gone");
-    showGalleryCount();
-  });
+  requestAnimationFrame(()=>{ scheduled=false; flushCards(); });
+}
+function flushCards(){
+  const group=incoming; incoming=[];
+  if(!group.length) return;
+  const frag=document.createDocumentFragment();
+  group.forEach(v=>{ if(!cards.has(String(v.id))) frag.appendChild(makeCard(v, S.galHandle)); });
+  $("#gal-grid").appendChild(frag);
+  $("#gal-empty").classList.add("gone");
+  showGalleryCount();
 }
 
 async function loadGallery(){
@@ -1668,10 +1672,16 @@ document.addEventListener("keydown",(e)=>{
 });
 
 /* Language is a separate preference from Whisper's speech recognition. */
-function languageName(code){
-  if(code==="auto") return I18n.text("detect from the video");
-  try{ return new Intl.DisplayNames([I18n.locale],{type:"language"}).of(code)||code; }
+/* Intl.DisplayNames arrived in Safari 14.1: macOS 11.0-11.2 has an older
+   WebKit, and one call outside a try stopped the whole page there */
+function displayName(locale, code){
+  try{ return new Intl.DisplayNames([locale],{type:"language"}).of(code)||code; }
   catch(_){ return code; }
+}
+function languageName(code){
+  /* a list item, so a capital like the rest: "detect from the video" next
+     to "Italian", and Italian's own "italiano", read as two styles */
+  return cap(code==="auto" ? I18n.text("detect from the video") : displayName(I18n.locale, code));
 }
 function renderCardMeta(c){
   const v=c._v;
@@ -1695,17 +1705,15 @@ function filterLanguages(){
   $$(".locale-option").forEach(b=>b.hidden=!b.dataset.search.includes(term));
 }
 function markLanguage(){
-  const display=new Intl.DisplayNames([I18n.locale],{type:"language"});
-  const english=new Intl.DisplayNames(["en"],{type:"language"});
   $$(".locale-option").forEach(b=>{
     b.setAttribute("aria-checked",String(b.dataset.locale===I18n.locale));
-    b.dataset.search=searchText(b.textContent+" "+b.dataset.locale+" "+display.of(b.dataset.locale)+" "+english.of(b.dataset.locale));
+    b.dataset.search=searchText(b.textContent+" "+b.dataset.locale+" "+displayName(I18n.locale,b.dataset.locale)+" "+displayName("en",b.dataset.locale));
   });
 }
 I18n.languages.forEach(language=>{
   const b=document.createElement("button");
   b.className="locale-option"; b.type="button"; b.dataset.locale=language.code;
-  b.dataset.search=(language.name+" "+language.code+" "+new Intl.DisplayNames(["en"],{type:"language"}).of(language.code)).toLocaleLowerCase();
+  b.dataset.search=(language.name+" "+language.code+" "+displayName("en",language.code)).toLocaleLowerCase();
   b.setAttribute("role","radio"); b.setAttribute("aria-checked","false");
   const name=document.createElement("span"); name.lang=language.code; name.dir="auto"; name.textContent=language.name;
   const selected=document.createElement("span"); selected.className="selected"; selected.setAttribute("aria-hidden","true");
@@ -1736,8 +1744,9 @@ $("#locale-menu").addEventListener("keydown",e=>{
     e.preventDefault(); buttons[e.key==="Home"?0:buttons.length-1]?.focus();
   }else if(e.key==="Tab"){
     const focusable=[$("#locale-search"),...buttons];
-    if(e.shiftKey && document.activeElement===focusable[0]){e.preventDefault();focusable.at(-1)?.focus();}
-    if(!e.shiftKey && document.activeElement===focusable.at(-1)){e.preventDefault();focusable[0].focus();}
+    const last=focusable[focusable.length-1];
+    if(e.shiftKey && document.activeElement===focusable[0]){e.preventDefault();last?.focus();}
+    if(!e.shiftKey && document.activeElement===last){e.preventDefault();focusable[0].focus();}
   }
 });
 document.addEventListener("click",e=>{if(!e.target.closest(".locale-shell"))closeLanguageMenu();});

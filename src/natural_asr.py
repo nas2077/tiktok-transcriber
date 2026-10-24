@@ -190,6 +190,13 @@ class NaturalEngine:
             check()
         try:
             check()
+            if self._session is None:
+                # an earlier fallback to the processor failed halfway: load
+                # again instead of failing every video after it
+                self._load("cpu")
+            supported = set(self._model.capabilities.languages)
+            if forced and supported and forced not in supported:
+                forced = None   # a language Qwen does not know: let it detect
             speech = get_speech_timestamps(audio, VadOptions(min_speech_duration_ms=100, min_silence_duration_ms=700))
             if not speech:
                 return [], {"language": "", "confidence": 0}
