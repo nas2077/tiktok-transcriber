@@ -1,6 +1,6 @@
 # Maintainer: Nas <https://github.com/nas2077>
 pkgname=tiktok-transcriber-bin
-pkgver=0.2.1
+pkgver=0.2.2
 pkgrel=1
 pkgdesc="Readable transcripts from public TikTok clips and profiles, recognized locally"
 arch=('x86_64' 'aarch64')
@@ -12,8 +12,8 @@ conflicts=('tiktok-transcriber')
 options=('!strip' '!debug')
 source_x86_64=("$pkgname-$pkgver-x86_64.tar.gz::$url/releases/download/v$pkgver/TikTok-Transcriber-$pkgver-linux-x86_64.tar.gz")
 source_aarch64=("$pkgname-$pkgver-aarch64.tar.gz::$url/releases/download/v$pkgver/TikTok-Transcriber-$pkgver-linux-aarch64.tar.gz")
-sha256sums_x86_64=('6c29fd5d84b0a819312052390f488057c1b229bee3bd87e452f17f4e7412fc01')
-sha256sums_aarch64=('cd744163a116246aa102789cc9e2d8a9a8ba4c3599ddf821031e8d4df5a779db')
+sha256sums_x86_64=('9c22b502d9477b3ee32940cb3c485560ea02e0ef20ac4aa0171d5cccfd3ef10e')
+sha256sums_aarch64=('af3522704e5ccde96ab493dffe5360bc60efaeee9c7bd6c7a5d21c6a98ef377a')
 
 package() {
   local id=io.github.nas2077.TikTokTranscriber
