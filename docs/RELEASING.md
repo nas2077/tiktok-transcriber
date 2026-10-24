@@ -70,7 +70,9 @@ how each system's FFmpeg libraries are sourced.
 each built app for 40 seconds as a smoke test (no model download). A `v*` tag
 whose version matches `APP_VERSION` publishes the release with all packages,
 `SHA256SUMS.txt` and `package-manifests.zip`, but only after every build, the
-portable ZIP check and every distribution container have passed.
+portable ZIP check and every distribution container have passed. A manual run of
+the workflow on `main` with **publish** checked does the same and creates the tag
+on the commit it built.
 
 ## Package managers
 
