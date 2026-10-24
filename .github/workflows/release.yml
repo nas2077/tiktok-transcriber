@@ -38,6 +38,33 @@ jobs:
           $crash = Join-Path $env:LOCALAPPDATA 'TikTok Transcriber\crash.log'
           if (Test-Path $crash) { Get-Content $crash; throw 'crash.log was written' }
           Write-Host 'TikTok Transcriber stayed open for 40 seconds.'
+      - name: Start the app from the portable ZIP, extracted as a download
+        run: |
+          # Explorer's Extract All marks every file of a downloaded ZIP as
+          # coming from the internet, and the .NET Framework refuses marked
+          # assemblies: 0.2.1's ZIP never opened, the folder above always did
+          $zip = Get-ChildItem dev\dist\TikTok-Transcriber-*-windows-x64.zip | Select-Object -First 1
+          $folder = Join-Path $env:USERPROFILE 'Downloads\TikTok Transcriber àé'
+          Expand-Archive -LiteralPath $zip.FullName -DestinationPath $folder
+          Get-ChildItem -LiteralPath $folder -Recurse -File | ForEach-Object {
+            Set-Content -LiteralPath $_.FullName -Stream Zone.Identifier -Value "[ZoneTransfer]`r`nZoneId=3`r`nHostUrl=https://github.com/"
+          }
+          # CreateProcess: ShellExecute would wait on the security prompt a person
+          # answers once for a downloaded .exe
+          $exe = Join-Path $folder 'TikTok Transcriber\TikTok Transcriber.exe'
+          $app = [Diagnostics.Process]::Start([Diagnostics.ProcessStartInfo]@{ FileName = $exe; UseShellExecute = $false })
+          Start-Sleep -Seconds 40
+          if ($app.HasExited) { throw "TikTok Transcriber exited early with code $($app.ExitCode)" }
+          # an error dialog keeps the process open too: the page must be running
+          $page = Get-CimInstance Win32_Process -Filter "Name = 'msedgewebview2.exe' AND ParentProcessId = $($app.Id)"
+          Stop-Process -Id $app.Id -Force
+          $crash = Join-Path $env:LOCALAPPDATA 'TikTok Transcriber\crash.log'
+          if (Test-Path $crash) { Get-Content $crash; throw 'crash.log was written' }
+          if (-not $page) { throw 'No WebView2 process: the window did not open' }
+          $assembly = Join-Path $folder 'TikTok Transcriber\runtime\pythonnet\runtime\Python.Runtime.dll'
+          if (Get-Item -LiteralPath $assembly -Stream Zone.Identifier -ErrorAction SilentlyContinue) { throw 'The runtime is still marked' }
+          Remove-Item -LiteralPath $folder -Recurse -Force -ErrorAction SilentlyContinue
+          Write-Host 'The extracted ZIP opened, marked as a download, and stayed open for 40 seconds.'
       - name: Transcribe real speech with the built app
         run: python dev/speech_smoke.py 'dev\build\dist\TikTok Transcriber\TikTok Transcriber.exe' small
       - name: Install, find and uninstall with the installer

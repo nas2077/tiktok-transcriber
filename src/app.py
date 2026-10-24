@@ -66,6 +66,7 @@ def _report_crash(text):
 
 
 try:
+    desktop.unblock_runtime(HERE)
     desktop.prepare_window_engine()
     import webview
 
@@ -1184,6 +1185,15 @@ def main():
     threading.Thread(target=core.clean_temp, daemon=True).start()
 
     api = Api()
+    if not desktop.webview2_installed():
+        from localization import translate
+
+        desktop.message_box(translate(
+            "the window needs the Microsoft Edge WebView2 Runtime, which is not on this "
+            "computer. its download page opens now: install it, then start the app again.",
+            api._ui_language()), TITLE)
+        desktop.open_link(desktop.WEBVIEW2_DOWNLOAD)
+        return
     window = webview.create_window(
         TITLE,
         html=read_interface(),

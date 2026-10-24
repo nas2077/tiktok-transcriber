@@ -10,6 +10,14 @@ Security update.
   lock files that model downloads use, to overwrite or delete the files of the
   person running the app, or to hold a lock past its timeout. Every 0.2.1
   package carried filelock 4.1.1; please update.
+- Windows: the portable ZIP opens. Explorer marks every file taken out of
+  a downloaded ZIP as coming from the internet, and the .NET Framework refused
+  the marked window libraries: 0.2.0 and 0.2.1 stopped with "the app could not
+  start". The app now clears the mark from its own runtime folder. The
+  installer was never affected. The release build now starts the extracted,
+  marked ZIP too.
+- Windows: without the Microsoft Edge WebView2 Runtime the app says so and
+  opens its download page, instead of showing a window that does not work.
 
 ## 0.2.1 — 2026-10-23
 

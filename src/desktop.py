@@ -47,6 +47,62 @@ def prepare_window_engine():
         os.environ.setdefault("QTWEBENGINE_DISABLE_SANDBOX", "1")
 
 
+def unblock_runtime(folder):
+    """
+    windows marks every file taken out of a downloaded zip as coming from the
+    internet: explorer's "extract all" copies the zip's Zone.Identifier
+    stream onto each of them. the .net framework refuses to load an assembly
+    carrying that mark, and the window is .net: pythonnet first, then the
+    WebView2 controls. the portable zip stopped there and never opened, the
+    installer's files never had the mark. the program takes it off its own
+    runtime, before the window library loads.
+    """
+    if not (WINDOWS and FROZEN):
+        return
+    # explorer marks all of them or none: one .net assembly tells
+    try:
+        open(os.path.join(folder, "pythonnet", "runtime", "Python.Runtime.dll")
+             + ":Zone.Identifier", "rb").close()
+    except OSError:
+        return
+    for root, _dirs, files in os.walk(folder):
+        for name in files:
+            try:
+                os.remove(os.path.join(root, name) + ":Zone.Identifier")
+            except OSError:
+                pass   # not marked, or a folder this user cannot write to
+
+
+WEBVIEW2_DOWNLOAD = "https://developer.microsoft.com/microsoft-edge/webview2/"
+
+
+def webview2_installed():
+    """
+    the window is WebView2 on windows. without it pywebview quietly falls
+    back to internet explorer's engine, which cannot run the page: a window
+    with nothing that works in it, not even its title bar. most windows 10
+    and every windows 11 has it; ltsc, n editions and trimmed installs may
+    not. the same registry keys pywebview reads: the runtime, then the beta,
+    dev and canary channels.
+    """
+    if not WINDOWS:
+        return True
+    import winreg
+
+    for client in ("{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}", "{2CD8A007-E189-409D-A2C8-9AF4EF3C72AA}",
+                   "{0D50BFEC-CD6A-4F9A-964C-C7416E3ACB10}", "{65C35B14-6C1D-4122-AC46-7148CC9D6497}"):
+        for hive, path in ((winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\"),
+                           (winreg.HKEY_CURRENT_USER, "SOFTWARE\\")):
+            try:
+                with winreg.OpenKey(hive, path + "Microsoft\\EdgeUpdate\\Clients\\" + client) as key:
+                    version = str(winreg.QueryValueEx(key, "pv")[0])
+            except OSError:
+                continue
+            if version and version != "0.0.0.0":
+                return True
+    return False
+
+
 def name_window():
     """
     the desktop pairs a window with its menu entry and icon by this name.

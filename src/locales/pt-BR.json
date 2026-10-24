@@ -296,5 +296,6 @@
   "Transcription models": "Modelos de transcrição",
   "Uses the graphics card": "Usa a placa de vídeo",
   "Uses the processor": "Usa o processador",
-  "Runs on": "Executa em"
+  "Runs on": "Executa em",
+  "the window needs the Microsoft Edge WebView2 Runtime, which is not on this computer. its download page opens now: install it, then start the app again.": "a janela precisa do Microsoft Edge WebView2 Runtime, que não está neste computador. A página de download abre agora: instale-o e depois abra o app de novo."
 }

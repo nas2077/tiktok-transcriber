@@ -296,5 +296,6 @@
   "Transcription models": "전사 모델",
   "Uses the graphics card": "그래픽 카드 사용",
   "Uses the processor": "프로세서 사용",
-  "Runs on": "실행 장치"
+  "Runs on": "실행 장치",
+  "the window needs the Microsoft Edge WebView2 Runtime, which is not on this computer. its download page opens now: install it, then start the app again.": "창을 표시하려면 Microsoft Edge WebView2 Runtime이 필요한데 이 컴퓨터에 없어요. 지금 다운로드 페이지가 열려요. 설치한 다음 앱을 다시 시작해 주세요."
 }
