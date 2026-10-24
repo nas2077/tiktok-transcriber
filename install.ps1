@@ -5,7 +5,7 @@
 # Downloads the per-user installer from the latest release, checks its SHA-256
 # and runs it silently: no administrator rights. TikTok Transcriber then appears in the
 # Start menu and in Settings > Apps, where it can be uninstalled.
-# $env:TIKTOK_TRANSCRIBER_VERSION = '0.2.1' installs that version instead of the latest.
+# $env:TIKTOK_TRANSCRIBER_VERSION = '0.2.2' installs that version instead of the latest.
 
 & {
     $ErrorActionPreference = 'Stop'

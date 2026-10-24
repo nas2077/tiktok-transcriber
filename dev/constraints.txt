@@ -11,7 +11,7 @@ colorama==0.4.6
 ctranslate2==4.8.3
 curl-cffi==0.16.3
 faster-whisper==1.2.1
-filelock==4.1.1
+filelock==4.2.1
 flatbuffers==25.12.19
 fsspec==2026.9.0
 h11==0.16.0

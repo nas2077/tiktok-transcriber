@@ -121,7 +121,7 @@
   },
   {
     "name": "filelock",
-    "version": "4.1.1",
+    "version": "4.2.1",
     "license": "MIT",
     "upstream": "https://py-filelock.readthedocs.io",
     "license_files": [

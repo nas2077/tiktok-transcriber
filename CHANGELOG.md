@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.2 — 2026-10-24
+
+Security update.
+
+- filelock 4.2.1 fixes six advisories published on 2026-10-23 (CVE-2026-112906,
+  CVE-2026-112907, CVE-2026-112913, CVE-2026-112914, CVE-2026-112937,
+  CVE-2026-112940). In each, another user on the same computer could abuse the
+  lock files that model downloads use, to overwrite or delete the files of the
+  person running the app, or to hold a lock past its timeout. Every 0.2.1
+  package carried filelock 4.1.1; please update.
+
 ## 0.2.1 — 2026-10-23
 
 Security update.
