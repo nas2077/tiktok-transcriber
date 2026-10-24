@@ -1,7 +1,8 @@
 name: Release
 # Builds every package on its own system. A manual run (workflow_dispatch)
-# only builds and keeps the files as workflow artifacts. A v* tag also makes
-# a DRAFT release with all files and checksums; publishing it stays manual.
+# only builds and keeps the files as workflow artifacts. A v* tag also
+# publishes the release with all files and checksums, once every package has
+# passed its checks, the distribution containers included.
 on:
   push:
     tags: ['v*']
@@ -347,7 +348,7 @@ jobs:
           if-no-files-found: error
 
   release:
-    needs: [windows, macos, linux, flatpak, python]
+    needs: [windows, macos, linux, distros, flatpak, python]
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
@@ -372,13 +373,13 @@ jobs:
           path: |
             assets/SHA256SUMS.txt
             assets/package-manifests.zip
-      - name: Draft release
+      - name: Publish release
         if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           [ "${GITHUB_REF_NAME}" = "v$VERSION" ] || { echo "tag ${GITHUB_REF_NAME} does not match version $VERSION"; exit 1; }
-          gh release create "v$VERSION" --draft --verify-tag --title "TikTok Transcriber $VERSION" \
+          gh release create "v$VERSION" --verify-tag --title "TikTok Transcriber $VERSION" \
             --notes "See [CHANGELOG.md](https://github.com/nas2077/tiktok-transcriber/blob/v$VERSION/CHANGELOG.md). Verify downloads with SHA256SUMS.txt." \
             assets/*
