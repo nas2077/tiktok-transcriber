@@ -1,4 +1,4 @@
-<p align="center"><img src=".github/assets/icon.svg" width="128" height="128" alt="TikTok Transcriber"></p>
+<p align="center"><img src=".github/assets/element.svg" width="128" height="128" alt="TikTok Transcriber"></p>
 
 <h1 align="center">TikTok Transcriber.</h1>
 <p align="center">Public clips. Clear text. On your computer.</p>
