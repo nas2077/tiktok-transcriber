@@ -1,6 +1,6 @@
 pkgbase = tiktok-transcriber-bin
 	pkgdesc = Readable transcripts from public TikTok clips and profiles, recognized locally
-	pkgver = 0.2.1
+	pkgver = 0.2.2
 	pkgrel = 1
 	url = https://github.com/nas2077/tiktok-transcriber
 	arch = x86_64
@@ -21,9 +21,9 @@ pkgbase = tiktok-transcriber-bin
 	conflicts = tiktok-transcriber
 	options = !strip
 	options = !debug
-	source_x86_64 = tiktok-transcriber-bin-0.2.1-x86_64.tar.gz::https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/TikTok-Transcriber-0.2.1-linux-x86_64.tar.gz
-	sha256sums_x86_64 = 6c29fd5d84b0a819312052390f488057c1b229bee3bd87e452f17f4e7412fc01
-	source_aarch64 = tiktok-transcriber-bin-0.2.1-aarch64.tar.gz::https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.1/TikTok-Transcriber-0.2.1-linux-aarch64.tar.gz
-	sha256sums_aarch64 = cd744163a116246aa102789cc9e2d8a9a8ba4c3599ddf821031e8d4df5a779db
+	source_x86_64 = tiktok-transcriber-bin-0.2.2-x86_64.tar.gz::https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.2/TikTok-Transcriber-0.2.2-linux-x86_64.tar.gz
+	sha256sums_x86_64 = 9c22b502d9477b3ee32940cb3c485560ea02e0ef20ac4aa0171d5cccfd3ef10e
+	source_aarch64 = tiktok-transcriber-bin-0.2.2-aarch64.tar.gz::https://github.com/nas2077/tiktok-transcriber/releases/download/v0.2.2/TikTok-Transcriber-0.2.2-linux-aarch64.tar.gz
+	sha256sums_aarch64 = af3522704e5ccde96ab493dffe5360bc60efaeee9c7bd6c7a5d21c6a98ef377a
 
 pkgname = tiktok-transcriber-bin
