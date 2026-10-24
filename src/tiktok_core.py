@@ -1739,7 +1739,9 @@ class Transcriber:
         span = times[-1] - times[0]
         if span <= 0:
             return None
-        return int(left * span / (len(times) - 1))
+        # rounded, not truncated: when the clock crosses a power of two the
+        # span comes out a hair short (4.4999...) and int() made 10 s into 9
+        return round(left * span / (len(times) - 1))
 
     def _progress(self):
         # everything read in one go under the lock: otherwise the numbers that
