@@ -47,6 +47,34 @@ class AnonymousTests(unittest.TestCase):
         self.assertFalse(core.is_video_link("https://eviltiktok.com/@sample/video/123"))
         self.assertFalse(core.is_video_link("https://www.tiktok.com/?next=/@sample/video/123"))
 
+    def test_post_links_become_one_canonical_video(self):
+        canonical = "https://www.tiktok.com/@sample/video/7300000000000000001"
+        for url in ("tiktok.com/@sample/video/7300000000000000001?lang=en",
+                    "https://m.tiktok.com/@sample/video/7300000000000000001/",
+                    "https://www.tiktok.com/@sample/photo/7300000000000000001"):
+            with self.subTest(url=url):
+                self.assertEqual(core.normalize_profile(url, _resolve=False)[2], canonical)
+        self.assertEqual(core.canonical_post("https://www.tiktok.com/@sample"), "https://www.tiktok.com/@sample")
+
+    def test_only_positive_limits_cut_the_list(self):
+        self.assertEqual([core.positive_limit(v) for v in (25, "50", 0, -3, "", None, "x")],
+                         [25, 50, None, None, None, None, None])
+
+    def test_whisper_stops_between_segments(self):
+        produced = []
+
+        def segments():
+            for i in range(50):
+                produced.append(i)
+                yield SimpleNamespace(text=f"word {i}", start=i, end=i + 1)
+
+        engine = core.Engine.__new__(core.Engine)
+        engine.m = SimpleNamespace(transcribe=lambda *a, **k: (
+            segments(), SimpleNamespace(language="it", language_probability=.9)))
+        with self.assertRaises(core.Cancelled):
+            core.transcribe_audio(engine, "clip", None, lambda: len(produced) >= 3)
+        self.assertEqual(len(produced), 3)
+
     def test_share_redirect_stays_on_tiktok(self):
         response = SimpleNamespace(headers={"Location": "https://tiktok.com.evil.example/@sample/video/123"})
         session = MagicMock()

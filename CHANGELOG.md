@@ -18,6 +18,19 @@ Security update.
   marked ZIP too.
 - Windows: without the Microsoft Edge WebView2 Runtime the app says so and
   opens its download page, instead of showing a window that does not work.
+- Closing the window during a job ends the app at once. A copy still winding
+  down kept the one-window lock, and the next start did nothing; a second
+  start also no longer brings an Explorer folder named "TikTok Transcriber"
+  forward instead of the app.
+- Linux: the sleep inhibitor no longer outlives the app (the computer could
+  stay awake until restarted) or leaves a process behind after every job.
+- Links without "www", from m.tiktok.com, and photo posts open as that one
+  post; a photo link used to start its whole profile, and gallery photo posts
+  could fail with "unsupported URL".
+- Stop and the gallery's Cancel interrupt a Whisper transcription between
+  segments instead of waiting for the whole video.
+- Switching from Natural to Whisper in the gallery runs as many transcriptions
+  in parallel as Whisper can, not one.
 
 ## 0.2.1 — 2026-10-23
 

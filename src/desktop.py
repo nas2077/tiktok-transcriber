@@ -5,9 +5,11 @@ equivalents; anything that cannot be done on a system quietly does nothing,
 because none of it is worth stopping a transcription for.
 """
 import os
+import signal
 import subprocess
 import sys
 import threading
+import time
 
 WINDOWS = sys.platform == "win32"
 MAC = sys.platform == "darwin"
@@ -256,23 +258,50 @@ def keep_awake(on):
         _awake_count = _awake_count + 1 if on else max(0, _awake_count - 1)
         if _awake_count and _awake_process is None:
             _awake_process = _start_inhibitor()
-        elif not _awake_count and _awake_process is not None:
-            try:
-                _awake_process.terminate()
-            except Exception:
-                pass
-            _awake_process = None
+        elif not _awake_count:
+            _stop_inhibitor()
+
+
+def allow_sleep():
+    """the app is ending: whatever was still running, the system may sleep"""
+    global _awake_count
+    if WINDOWS:
+        return   # the request belongs to threads that end with the process
+    with _awake_lock:
+        _awake_count = 0
+        _stop_inhibitor()
+
+
+def _stop_inhibitor():
+    global _awake_process
+    if _awake_process is None:
+        return
+    try:
+        # the whole group: systemd-inhibit and the command it holds the lock
+        # for. killing systemd-inhibit alone left that command running, one
+        # more after every job
+        os.killpg(_awake_process.pid, signal.SIGTERM)
+    except Exception:
+        pass
+    _awake_process = None
 
 
 def _start_inhibitor():
+    """
+    the helper ends by itself when the app does, however the app ends: the
+    lock used to outlive a window closed in the middle of a job, and the
+    computer then never slept again until it was restarted.
+    """
     if MAC:
         command = ["caffeinate", "-i", "-w", str(os.getpid())]
     else:
         command = ["systemd-inhibit", "--what=idle:sleep", "--who=TikTok Transcriber",
-                   "--why=Transcribing", "--mode=block", "sleep", "infinity"]
+                   "--why=Transcribing", "--mode=block",
+                   "tail", "--pid=" + str(os.getpid()), "-f", "/dev/null"]
     try:
         return subprocess.Popen(command, env=_clean_environment(), stdin=subprocess.DEVNULL,
-                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                                start_new_session=True)
     except OSError:
         return None
 
@@ -373,12 +402,21 @@ def already_running(title):
             _instance = k.CreateMutexW(None, False, "Local\\tiktok-transcriber")
             if ctypes.get_last_error() != 183:  # ERROR_ALREADY_EXISTS
                 return False
-            u = ctypes.windll.user32
-            hwnd = u.FindWindowW(None, title)
-            if hwnd:
-                u.ShowWindow(hwnd, 9)  # SW_RESTORE
-                u.SetForegroundWindow(hwnd)
-            return True
+            # the other copy may still be opening its window: give it time.
+            # one with no window at all (a copy winding down after its window
+            # closed) must not keep this one from opening: a double click
+            # that did nothing looked exactly like an app that does not start
+            for _ in range(40):
+                hwnd = _own_window(title)
+                if hwnd:
+                    u = ctypes.windll.user32
+                    u.ShowWindow.argtypes = [ctypes.c_void_p, ctypes.c_int]
+                    u.SetForegroundWindow.argtypes = [ctypes.c_void_p]
+                    u.ShowWindow(hwnd, 9)  # SW_RESTORE
+                    u.SetForegroundWindow(hwnd)
+                    return True
+                time.sleep(0.25)
+            return False
         except Exception:
             return False
     # a lock the system releases by itself when the process ends, even on a crash
@@ -395,6 +433,56 @@ def already_running(title):
         return False
     except Exception:
         return False
+
+
+def _own_window(title):
+    """
+    the visible window of another copy of this program, or None. by title
+    alone it found explorer too: the portable folder is called "TikTok
+    Transcriber" as well, so a second start brought that folder forward.
+    """
+    import ctypes
+    from ctypes import wintypes
+
+    u = ctypes.WinDLL("user32")
+    k = ctypes.WinDLL("kernel32")
+    k.OpenProcess.restype = wintypes.HANDLE
+    k.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+    k.CloseHandle.argtypes = [wintypes.HANDLE]
+    k.QueryFullProcessImageNameW.argtypes = [wintypes.HANDLE, wintypes.DWORD, wintypes.LPWSTR,
+                                             ctypes.POINTER(wintypes.DWORD)]
+    u.GetWindowTextLengthW.argtypes = [wintypes.HWND]
+    u.GetWindowTextW.argtypes = [wintypes.HWND, wintypes.LPWSTR, ctypes.c_int]
+    u.IsWindowVisible.argtypes = [wintypes.HWND]
+    u.GetWindowThreadProcessId.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.DWORD)]
+    mine = os.path.basename(sys.executable).lower()
+    found = []
+
+    @ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+    def visit(hwnd, _):
+        if not u.IsWindowVisible(hwnd) or u.GetWindowTextLengthW(hwnd) != len(title):
+            return True
+        text = ctypes.create_unicode_buffer(len(title) + 1)
+        u.GetWindowTextW(hwnd, text, len(text))
+        pid = wintypes.DWORD()
+        u.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+        if text.value != title or pid.value == os.getpid():
+            return True
+        process = k.OpenProcess(0x1000, False, pid.value)  # PROCESS_QUERY_LIMITED_INFORMATION
+        if not process:
+            return True
+        try:
+            path, size = ctypes.create_unicode_buffer(32768), wintypes.DWORD(32768)
+            if (k.QueryFullProcessImageNameW(process, 0, path, ctypes.byref(size))
+                    and os.path.basename(path.value).lower() == mine):
+                found.append(hwnd)
+                return False
+        finally:
+            k.CloseHandle(process)
+        return True
+
+    u.EnumWindows(visit, 0)
+    return found[0] if found else None
 
 
 def message_box(text, title):

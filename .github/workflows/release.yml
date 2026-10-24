@@ -57,14 +57,20 @@ jobs:
           if ($app.HasExited) { throw "TikTok Transcriber exited early with code $($app.ExitCode)" }
           # an error dialog keeps the process open too: the page must be running
           $page = Get-CimInstance Win32_Process -Filter "Name = 'msedgewebview2.exe' AND ParentProcessId = $($app.Id)"
-          Stop-Process -Id $app.Id -Force
+          if (-not $page) { Stop-Process -Id $app.Id -Force; throw 'No WebView2 process: the window did not open' }
+          # a second start brings the open window forward and leaves
+          $second = [Diagnostics.Process]::Start([Diagnostics.ProcessStartInfo]@{ FileName = $exe; UseShellExecute = $false })
+          if (-not $second.WaitForExit(30000)) { $second.Kill(); Stop-Process -Id $app.Id -Force; throw 'A second start stayed open beside the first' }
+          if ($app.HasExited) { throw 'The first copy ended when the second start came' }
+          # closing the window ends the whole process, whatever is still running
+          if (-not $app.CloseMainWindow()) { Stop-Process -Id $app.Id -Force; throw 'The window could not be asked to close' }
+          if (-not $app.WaitForExit(30000)) { Stop-Process -Id $app.Id -Force; throw 'The process outlived its window' }
           $crash = Join-Path $env:LOCALAPPDATA 'TikTok Transcriber\crash.log'
           if (Test-Path $crash) { Get-Content $crash; throw 'crash.log was written' }
-          if (-not $page) { throw 'No WebView2 process: the window did not open' }
           $assembly = Join-Path $folder 'TikTok Transcriber\runtime\pythonnet\runtime\Python.Runtime.dll'
           if (Get-Item -LiteralPath $assembly -Stream Zone.Identifier -ErrorAction SilentlyContinue) { throw 'The runtime is still marked' }
           Remove-Item -LiteralPath $folder -Recurse -Force -ErrorAction SilentlyContinue
-          Write-Host 'The extracted ZIP opened, marked as a download, and stayed open for 40 seconds.'
+          Write-Host 'The extracted ZIP opened marked as a download, a second start left, and closing the window ended it.'
       - name: Transcribe real speech with the built app
         run: python dev/speech_smoke.py 'dev\build\dist\TikTok Transcriber\TikTok Transcriber.exe' small
       - name: Install, find and uninstall with the installer

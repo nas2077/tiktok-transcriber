@@ -68,7 +68,7 @@ def profile_info(url):
 
 
 def video_info(url):
-    match = re.fullmatch(r"https?://(?:www\.)?tiktok\.com/@[\w.-]+/video/(\d+)(?:[/?#].*)?", url or "")
+    match = re.fullmatch(r"https?://(?:[\w-]+\.)?tiktok\.com/@[\w.-]+/(?:video|photo)/(\d+)(?:[/?#].*)?", url or "")
     if not match:
         raise PublicVideoUnavailable()
     video_id = match[1]
