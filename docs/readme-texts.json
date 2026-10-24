@@ -1,7 +1,7 @@
 {
   "en": {
     "sections": [
-      "<p align=\"center\"><img src=\".github/assets/icon.svg\" width=\"128\" height=\"128\" alt=\"TikTok Transcriber\"></p>\n\n<h1 align=\"center\">TikTok Transcriber.</h1>\n<p align=\"center\">Public clips. Clear text. On your computer.</p>",
+      "<p align=\"center\"><img src=\".github/assets/element.svg\" width=\"128\" height=\"128\" alt=\"TikTok Transcriber\"></p>\n\n<h1 align=\"center\">TikTok Transcriber.</h1>\n<p align=\"center\">Public clips. Clear text. On your computer.</p>",
       "[![Checks](https://github.com/nas2077/tiktok-transcriber/actions/workflows/checks.yml/badge.svg)](https://github.com/nas2077/tiktok-transcriber/actions/workflows/checks.yml) [![CodeQL](https://github.com/nas2077/tiktok-transcriber/actions/workflows/codeql.yml/badge.svg)](https://github.com/nas2077/tiktok-transcriber/actions/workflows/codeql.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-a35139.svg)](LICENSE)",
       "TikTok Transcriber turns public TikTok videos and profiles into readable transcripts on Windows, macOS, and Linux. Recognition runs locally with integrated Qwen and Whisper models. Paste a link, choose an output folder, and start.",
       "## Features\n\n- Transcribe one video, selected gallery items, or a complete public profile.\n- Readable paragraphs in Markdown or plain text, with optional timestamps.\n- A per-video file, combined collection, and CSV metadata index.\n- Resume previous work and retry individual videos.\n- Preview covers and save original videos as MP4.\n- Four integrated model choices with automatic downloads.\n- Fourteen interface languages, dark/light themes, and reduced motion.",
