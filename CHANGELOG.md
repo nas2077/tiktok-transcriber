@@ -31,6 +31,10 @@ Security update.
   segments instead of waiting for the whole video.
 - Switching from Natural to Whisper in the gallery runs as many transcriptions
   in parallel as Whisper can, not one.
+- Gallery: a card's state that arrived together with its batch was lost, and
+  the "already transcribed" count could miss the last batch.
+- macOS 11.0-11.2: the window no longer stops on language names or keyboard
+  focus that its older WebKit does not support.
 
 ## 0.2.1 — 2026-10-23
 
